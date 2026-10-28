@@ -1,0 +1,1162 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>After the Blue マップ工房</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#f1ede3;--panel:#faf7ef;--panel2:#ece7da;--line:#d6cfbe;--fg:#1c2a33;--mute:#6a7479;
+  --acc:#1f78b4;--acc-fg:#fff;--acc-soft:#d8e9f5;--warn:#b5651d;--bad:#b3362f;--ok:#2d7a4f;
+  --canvas:#e4dfd0;--grid:rgba(28,42,51,.10);--grid2:rgba(28,42,51,.22);--shadow:0 6px 22px rgba(28,42,51,.18);
+  --ui:'Zen Kaku Gothic New','Hiragino Sans','Yu Gothic',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121a20;--panel:#1a252d;--panel2:#22303a;--line:#33444f;--fg:#e3ebef;--mute:#8fa1ab;
+  --acc:#5ab0e6;--acc-fg:#0b1a24;--acc-soft:#1f3d52;--warn:#e0a35a;--bad:#ef7b72;--ok:#66c68f;
+  --canvas:#0e1519;--grid:rgba(227,235,239,.09);--grid2:rgba(227,235,239,.2);--shadow:0 6px 22px rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121a20;--panel:#1a252d;--panel2:#22303a;--line:#33444f;--fg:#e3ebef;--mute:#8fa1ab;
+  --acc:#5ab0e6;--acc-fg:#0b1a24;--acc-soft:#1f3d52;--warn:#e0a35a;--bad:#ef7b72;--ok:#66c68f;
+  --canvas:#0e1519;--grid:rgba(227,235,239,.09);--grid2:rgba(227,235,239,.2);--shadow:0 6px 22px rgba(0,0,0,.5);color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--ui);font-size:14px;line-height:1.45;overflow-x:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer;min-height:30px}
+button:hover{border-color:var(--acc)}
+button.on,button.pri{background:var(--acc);color:var(--acc-fg);border-color:var(--acc)}
+button.bad{color:var(--bad)}
+button:disabled{opacity:.45;cursor:default}
+input[type=text],input[type=number],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 8px;min-width:0;width:100%}
+textarea{font-family:var(--mono);font-size:12px;resize:vertical}
+input[type=range]{width:100%}
+input[type=checkbox]{width:auto;flex:none;margin:0}
+.row>input[type=checkbox]{flex:none}
+.pill:empty{display:none}
+label.row{flex-wrap:nowrap;align-items:flex-start}
+label.row>input{margin-top:3px}
+.mono{font-family:var(--mono);font-size:12px}
+#app{display:flex;flex-direction:column;height:100%;min-height:0}
+.top{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;padding:8px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+.brand{font-weight:700;letter-spacing:.02em;white-space:nowrap}
+.brand small{display:block;font-weight:400;font-size:10px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
+#projName{width:170px;font-weight:500}
+.tabs{display:flex;gap:2px;background:var(--panel2);padding:2px;border-radius:8px}
+.tabs button{border:0;background:transparent;padding:5px 12px}
+.tabs button.on{background:var(--acc);color:var(--acc-fg)}
+.grow{flex:1}
+.chip{font-size:12px;color:var(--mute);white-space:nowrap}
+.chip.dirty{color:var(--warn)}.chip.okc{color:var(--ok)}
+.body{flex:1;display:grid;grid-template-columns:34px var(--dl,270px) minmax(0,1fr) var(--dr,300px) 34px;min-height:0;position:relative;transition:grid-template-columns .22s ease}
+.rail{background:var(--panel2);display:flex;flex-direction:column;gap:6px;padding:8px 4px;align-items:center;min-height:0;min-width:0}
+.rail.l{border-right:1px solid var(--line)}.rail.r{border-left:1px solid var(--line)}
+.rail button{flex:none;white-space:nowrap;writing-mode:vertical-rl;padding:12px 6px;min-height:0;letter-spacing:.16em;font-weight:500;border-radius:8px;line-height:1.2;display:block;text-align:center;inline-size:max-content;block-size:auto}
+.rail button.on{background:var(--acc);color:var(--acc-fg);border-color:var(--acc)}
+.bdg{display:inline-block;margin-block-start:5px;writing-mode:horizontal-tb;font-size:10px;line-height:1;background:var(--warn);color:#161616;border-radius:999px;padding:2px 5px;letter-spacing:0;font-weight:700}
+.bdg:empty{display:none}.bdg.dot{padding:0;width:8px;height:8px;background:var(--acc)}
+.drawer{overflow:hidden;min-width:0;background:var(--panel);transition:visibility 0s}
+.drawer:not(.open){visibility:hidden;transition:visibility 0s .22s}
+.drawer .side{width:270px;height:100%}.drawer.r .side{width:300px}
+.side{background:var(--panel);overflow:auto;padding:12px 14px;display:flex;flex-direction:column;gap:14px;min-height:0}
+
+.side h3{margin:0 0 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);font-weight:700}
+.sec{display:flex;flex-direction:column;gap:6px;min-width:0}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;min-width:0}
+.row>label{font-size:12px;color:var(--mute);min-width:52px}
+.row>input,.row>select{flex:1}
+.stage{position:relative;min-width:0;min-height:0;background:var(--canvas);overflow:hidden}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.hud{position:absolute;left:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap;pointer-events:none}
+.hud>*{pointer-events:auto}
+.hud .pill{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;box-shadow:var(--shadow)}
+.hud.br{left:auto;right:10px;top:auto;bottom:10px}
+#hover{position:absolute;z-index:5;pointer-events:none;background:var(--panel);border:1px solid var(--acc);border-radius:10px;box-shadow:var(--shadow);padding:6px;max-width:92%}
+#hover canvas{position:static;display:block;border-radius:5px;background:var(--canvas)}
+#hover .t{font-size:12px;margin-bottom:4px;display:flex;gap:8px;justify-content:space-between}
+.pal{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:5px}
+.sw{display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:4px;text-align:left;font-size:11px;line-height:1.2;min-height:0}
+.sw canvas{width:100%;height:30px;border-radius:3px;background:var(--canvas);display:block}
+.sw .id{font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw .ty{color:var(--mute);font-size:10px}
+.sw.on{outline:2px solid var(--acc);background:var(--acc-soft)}
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.tools button{padding:4px 2px;font-size:12px;text-align:center}
+.list{display:flex;flex-direction:column;gap:2px;max-height:240px;overflow:auto}
+.list button{text-align:left;display:flex;gap:6px;align-items:center;border-color:transparent;background:transparent;padding:3px 6px}
+.list button:hover{background:var(--panel2)}
+.list button.on{background:var(--acc-soft);border-color:var(--acc)}
+.dot{width:10px;height:10px;border-radius:3px;flex:none}
+.warnrow{font-size:12px;display:flex;gap:6px;align-items:flex-start;padding:4px 6px;border-radius:5px;text-align:left;width:100%}
+.warnrow.w{background:color-mix(in srgb,var(--warn) 14%,transparent)}.warnrow.e{background:color-mix(in srgb,var(--bad) 14%,transparent)}.warnrow.i{background:var(--panel2)}
+.hint{font-size:12px;color:var(--mute)}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(10,18,24,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.modal>.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);width:min(900px,100%);max-height:100%;display:flex;flex-direction:column;min-height:0}
+.box>.hd{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-weight:700}
+.box>.bd{padding:12px 14px;overflow:auto;display:flex;flex-direction:column;gap:10px;min-height:0}
+.box textarea{min-height:280px;height:46vh}
+kbd{font-family:var(--mono);font-size:11px;background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+table.kv{border-collapse:collapse;font-size:12px}table.kv td{padding:2px 8px 2px 0;vertical-align:top}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:7px 14px;border-radius:999px;font-size:13px;z-index:80;box-shadow:var(--shadow)}
+@media (max-width:980px){.body{grid-template-columns:30px minmax(0,1fr) 30px}
+  .drawer{position:absolute;top:0;bottom:0;z-index:20;box-shadow:var(--shadow)}.drawer.l{left:30px}.drawer.r{right:30px}
+  .drawer .side,.drawer.r .side{width:min(84vw,310px)}.drawer:not(.open){display:none}}
+</style>
+
+<div id="app">
+ <header class="top">
+  <div class="brand">After the Blue<small>Map Workshop</small></div>
+  <input id="projName" type="text" aria-label="プロジェクト名">
+  <div class="tabs" id="tabs">
+   <button data-m="over" class="on">概要マップ</button><button data-m="room">部屋詳細</button><button data-m="world">全体マップ</button>
+  </div>
+  <button id="bUndo" title="元に戻す (Ctrl+Z)">↶</button><button id="bRedo" title="やり直す (Ctrl+Y)">↷</button>
+  <span class="grow"></span>
+  <span class="chip" id="saveChip">未保存</span>
+  <button id="bSave" class="pri">保存</button>
+  <button id="bVer">版</button>
+  <button id="bExp">AI用に書き出し</button>
+  <button id="bImp">読み込み</button>
+  <button id="bHelp">?</button>
+  <button id="bTheme" title="テーマ切替">◐</button>
+ </header>
+ <div class="body" id="body">
+  <nav class="rail l" id="railL"><button data-tab="tools" title="ツール" style="min-height:66px">ツール</button></nav>
+  <div class="drawer l" id="drL"><aside class="side l" id="leftP"></aside></div>
+  <main class="stage" id="stage">
+   <canvas id="cv"></canvas>
+   <div class="hud" id="hudL"></div>
+   <div class="hud br" id="hudR"></div>
+   <div id="hover" hidden></div>
+  </main>
+  <div class="drawer r" id="drR"><aside class="side r" id="rightP"></aside></div>
+  <nav class="rail r" id="railR"><button data-tab="detail" title="選択中の詳細" style="min-height:54px">詳細<span class="bdg dot" id="detDot" hidden></span></button><button data-tab="check" title="チェック" style="min-height:80px">チェック<span class="bdg" id="chkN"></span></button></nav>
+ </div>
+</div>
+<div id="modal" class="modal" hidden></div>
+<script>
+(function(){
+'use strict';
+/* ===== core ===== */
+const SEED={"areas":{"aby_school":{"name":"アビドス高校跡","col":"#3a8f98"},"aby_town":{"name":"砂没市街","col":"#b39a62"},"aby_highway":{"name":"崩落高架","col":"#6f8aa3"},"kaiser_base":{"name":"カイザーPMC前線基地","col":"#9a6464"},"bm_under":{"name":"ブラックマーケット地下流通路","col":"#7c5ea6"},"past":{"name":"訓練場（過去）","col":"#6a4a7a"}},"rooms":{"t_dojo":{"id":"t_dojo","name":"訓練場（過去）","area":"past","gx":0,"gy":0,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#......====....====............#","#..............................#","#..............................#","#..............................#","################################","################################"],"objs":[{"id":"t_dojo_start","type":"entrance","x":2.5,"y":8,"mode":"G","face":1}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"dojo"},"note":""},"s_yard":{"id":"s_yard","name":"校庭跡","area":"aby_school","gx":1,"gy":2,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#...............................","#...............................","#...............................","#...............................","#...............................","#...............................","###....##################====###","###....##################....###"],"objs":[{"id":"cp_yard","type":"save","x":6.2,"y":8,"label":"","gate":""},{"id":"s_yard_start","type":"entrance","x":4.6,"y":8,"mode":"G","face":1},{"id":"s_yard_fromW","type":"entrance","x":4.4,"y":8,"mode":"G","face":1},{"id":"s_yard_fromE","type":"entrance","x":11.6,"y":8,"mode":"G","face":-1},{"id":"mem_photo","type":"memory","x":8.5,"y":8,"label":"写真の破片"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"school"},"note":""},"s_sunken":{"id":"s_sunken","name":"砂に呑まれた訓練場","area":"aby_school","gx":1,"gy":3,"w":1,"h":1,"rows":["###....##################....###","#..............................#","#..............................#","#..............................#","#..====..................====..#","#..............................#","#..............................#","#......===............===......#","#..............................#","#..............................#","#.====....................====.#","#..............................#","#..............................#","#......===............===......#","#..............................#","#..............................#","###########..........###########","###########..........###########"],"objs":[{"id":"sc_sk1","type":"enemy","x":9,"y":3,"kind":"bm_scout","cond":"hasShotgun"},{"id":"sc_sk2","type":"enemy","x":12.5,"y":2.5,"kind":"bm_scout","cond":"hasShotgun"},{"id":"sc_sk3","type":"enemy","x":6.5,"y":2,"kind":"bm_scout","cond":"hasShotgun"},{"id":"s_sunken_topW","type":"entrance","x":2.5,"y":1.5,"mode":"A","face":1},{"id":"s_sunken_W","type":"entrance","x":3,"y":8,"mode":"G","face":1},{"id":"pk_shotgun","type":"item","x":2.5,"y":8,"item":"shotgun","mode":"interact","cons":false}],"bg":null,"flags":{"goal":false,"pit":"流砂","bgm":"school"},"note":""},"s_entrance":{"id":"s_entrance","name":"昇降口","area":"aby_school","gx":2,"gy":2,"w":1,"h":1,"rows":["##############....##############","#..............................#","#..............................#","#..............................#","#.............====.............#","#..............................#","#..............................#","#..................===.........#","#..............................#","#..............................#",".......................===......","................................","................................","...................===..........","................................","................................","################################","################################"],"objs":[{"id":"w_school","type":"warp","x":4.2,"y":8,"label":"昇降口","gate":""},{"id":"sc_en1","type":"enemy","x":6,"y":3.2,"kind":"bm_scout","cond":""},{"id":"sc_en2","type":"enemy","x":13,"y":2.6,"kind":"bm_scout","cond":""},{"id":"s_entrance_top","type":"entrance","x":8.1,"y":1.5,"mode":"A","face":-1},{"id":"cs_school","type":"item","x":13.5,"y":8,"item":"heal_item","mode":"contact","cons":true},{"id":"mem_shoes","type":"memory","x":2,"y":8,"label":"下駄箱の名札"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"school"},"note":""},"s_hall2":{"id":"s_hall2","name":"二階廊下","area":"aby_school","gx":2,"gy":1,"w":1,"h":1,"rows":["##############....##############","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#...........========...........#","#..............................#","#..............................#","#..............................#","#...............................","#...............................","#...............................","#...............................","#...............................","#...............................","##############....##############","##############....##############"],"objs":[{"id":"kr_h2","type":"enemy","x":12,"y":8,"kind":"kp_rifle","cond":""},{"id":"s_hall2_fromBelow","type":"entrance","x":10.2,"y":8,"mode":"G","face":1},{"id":"s_hall2_top","type":"entrance","x":8,"y":1.5,"mode":"A","face":1},{"id":"mem_ledger","type":"memory","x":3,"y":8,"label":"古い会計書類"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"school"},"note":""},"s_roof":{"id":"s_roof","name":"屋上・西","area":"aby_school","gx":2,"gy":0,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#...=====......................#","#...............................","#...............................","#...............................","#...............................","#...............................","#...............................","##############....##############","##############....##############"],"objs":[{"id":"s_roof_fromBelow","type":"entrance","x":10,"y":8,"mode":"G","face":1},{"id":"pk_hp_roof","type":"item","x":3.2,"y":4.5,"item":"hp_up","mode":"contact","cons":false}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"school"},"note":""},"s_roof2":{"id":"s_roof2","name":"屋上・東","area":"aby_school","gx":3,"gy":0,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#...............................","#...............................","#...............................","#...............................","#...............................","#.......................########","#.......................########","........................########",".....................===########","........................########","...................===..########","........................########","........................########","################################","################################"],"objs":[{"id":"sc_r2a","type":"enemy","x":5,"y":2.6,"kind":"bm_scout","cond":""},{"id":"sc_r2b","type":"enemy","x":9,"y":2,"kind":"bm_scout","cond":""},{"id":"mem_supply","type":"memory","x":5,"y":8,"label":"ノノミの備品らしきもの"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"school"},"note":""},"s_tower":{"id":"s_tower","name":"時計塔跡","area":"aby_school","gx":4,"gy":0,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","...............................#","........................====...#","...............................#",".........====..................#","...............................#","######.........................#","######.........................#","######.........................#","######..............====.......#","######.........................#","######.........................#","######.........................#","######.........................#","##############....##############","##############....##############"],"objs":[{"id":"sc_tw1","type":"enemy","x":6,"y":5,"kind":"bm_scout","cond":""},{"id":"sc_tw2","type":"enemy","x":11,"y":3.4,"kind":"bm_scout","cond":""},{"id":"sc_tw3","type":"enemy","x":13,"y":6,"kind":"bm_scout","cond":""},{"id":"bb_tw","type":"enemy","x":8,"y":1.3,"kind":"bm_bomber","cond":""},{"id":"s_tower_fromBelow","type":"entrance","x":10.2,"y":8,"mode":"G","face":1},{"id":"pk_bd_drone","type":"item","x":13,"y":2.2,"item":"badge_drone","mode":"contact","cons":false}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"school"},"note":""},"s_collapse":{"id":"s_collapse","name":"崩落廊下","area":"aby_school","gx":3,"gy":1,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","................................","................................","................................","................................","................................","................................","###########..........###########","###########..........###########"],"objs":[{"id":"tu_col","type":"enemy","x":13.5,"y":8,"kind":"kp_turret","cond":""}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"school"},"note":""},"s_club":{"id":"s_club","name":"旧対策委員会室","area":"aby_school","gx":4,"gy":1,"w":1,"h":1,"rows":["##############....##############","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","...............................#","...............................#","...............................#","...............................#","...............................#","...............................#","################################","################################"],"objs":[{"id":"s_club_top","type":"entrance","x":8,"y":1.5,"mode":"A","face":-1},{"id":"pk_drone","type":"item","x":4.5,"y":8,"item":"drone","mode":"interact","cons":false},{"id":"mem_seat","type":"memory","x":11,"y":8,"label":"対策委員会室の席"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"school"},"note":""},"s_bikes":{"id":"s_bikes","name":"駐輪場跡","area":"aby_school","gx":3,"gy":2,"w":1,"h":1,"rows":["###########..........###########","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","................................","................................","................................","................................","................................","................................","################################","################################"],"objs":[{"id":"kr_bk","type":"enemy","x":11.5,"y":8,"kind":"kp_rifle","cond":""},{"id":"s_bikes_topFall","type":"entrance","x":8,"y":1.5,"mode":"A","face":1},{"id":"mem_bike","type":"memory","x":4,"y":8,"label":"壊れた自転車"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"school"},"note":""},"t_gate":{"id":"t_gate","name":"市街入口","area":"aby_town","gx":4,"gy":2,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","................................","................................","................................","................................","................................","................................","################################","################################"],"objs":[{"id":"cp_town","type":"save","x":5,"y":8,"label":"","gate":""},{"id":"w_town","type":"warp","x":10.5,"y":8,"label":"市街入口","gate":""}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"town"},"note":""},"t_arcade":{"id":"t_arcade","name":"旧商店街","area":"aby_town","gx":5,"gy":2,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","................................","................................","................................","................................","................................","................................","################################","################################"],"objs":[{"id":"kr_ar1","type":"enemy","x":9,"y":8,"kind":"kp_rifle","cond":""},{"id":"kr_ar2","type":"enemy","x":13,"y":8,"kind":"kp_rifle","cond":""},{"id":"cs_town","type":"item","x":11.5,"y":8,"item":"heal_item","mode":"contact","cons":true},{"id":"mem_memo","type":"memory","x":4,"y":8,"label":"セリカの残したメモ"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"town"},"note":""},"t_cross":{"id":"t_cross","name":"交差点（J1）","area":"aby_town","gx":6,"gy":2,"w":1,"h":1,"rows":["####....########################","#..............................#","#..............................#","#..............................#","#...====.......................#","#..............................#","#..............................#","#.......====...................#","#..............................#","#..............................#","....====........................","................................","................................","........====....................","................................","................................","##############....##############","##############....##############"],"objs":[{"id":"tu_cr","type":"enemy","x":12.5,"y":8,"kind":"kp_turret","cond":""},{"id":"sign_1","type":"sign","x":13.6,"y":4.6,"label":"KAISER PMC / 立入禁止"},{"id":"sign_2","type":"sign","x":8,"y":6.8,"label":"B.M. ↓"},{"id":"t_cross_topL","type":"entrance","x":3,"y":1.5,"mode":"A","face":1},{"id":"t_cross_fromBelow","type":"entrance","x":10.2,"y":8,"mode":"G","face":-1}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"town"},"note":""},"t_bridge":{"id":"t_bridge","name":"歩道橋","area":"aby_town","gx":6,"gy":1,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#...............................","#...............................","#...............................","#...............................","#...............................","#...............................","#...................############","#...................############","#................===############","#...................############","####....########################","####....########################"],"objs":[{"id":"sc_br1","type":"enemy","x":7,"y":3,"kind":"bm_scout","cond":""},{"id":"sc_br2","type":"enemy","x":12,"y":2.6,"kind":"bm_scout","cond":""},{"id":"t_bridge_fromBelow","type":"entrance","x":5,"y":8,"mode":"G","face":1},{"id":"tr_1","type":"trace","x":12.6,"y":6,"label":"ペロロのステッカー"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"town"},"note":""},"t_roofs":{"id":"t_roofs","name":"屋上伝い","area":"aby_town","gx":7,"gy":1,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","................................","................................","................................","................................","................................","................................","############......##############","############......##############","############.===..##############","############......##############","################################","################################"],"objs":[{"id":"sc_rf1","type":"enemy","x":4,"y":2.6,"kind":"bm_scout","cond":""},{"id":"sc_rf2","type":"enemy","x":12,"y":2.6,"kind":"bm_scout","cond":""},{"id":"bb_rf","type":"enemy","x":7.5,"y":1.3,"kind":"bm_bomber","cond":""}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"town"},"note":""},"t_mixed":{"id":"t_mixed","name":"雑居ビル（J2）","area":"aby_town","gx":8,"gy":1,"w":1,"h":1,"rows":["##############....##############","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#",".............======............#","...............................#","...............................#","...............................#","................................","................................","########........................","########........................","########===.....................","########........................","####################....########","####################....########"],"objs":[{"id":"kr_mx","type":"enemy","x":7,"y":8,"kind":"kp_rifle","cond":""},{"id":"kg_mx","type":"enemy","x":14,"y":8,"kind":"kp_grenadier","cond":""},{"id":"sign_3","type":"sign","x":11,"y":7.4,"label":"↓ KAISER"},{"id":"t_mixed_top","type":"entrance","x":8,"y":1.5,"mode":"A","face":1}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"town"},"note":""},"t_sign":{"id":"t_sign","name":"看板の上","area":"aby_town","gx":8,"gy":0,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","##############....##############","##############....##############"],"objs":[{"id":"t_sign_fromBelow","type":"entrance","x":10,"y":8,"mode":"G","face":1},{"id":"pk_bd_vital","type":"item","x":11,"y":8,"item":"badge_vital","mode":"contact","cons":false}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"town"},"note":""},"t_tank":{"id":"t_tank","name":"給水塔の屋上","area":"aby_town","gx":9,"gy":1,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","................................","................................","................................","................................","................................","................................","################################","################################"],"objs":[{"id":"kg_tk","type":"enemy","x":13,"y":8,"kind":"kp_grenadier","cond":""},{"id":"ks_tk","type":"enemy","x":9.5,"y":8,"kind":"kp_shield","cond":""},{"id":"tr_2","type":"trace","x":4,"y":8,"label":"モモフレンズのキーホルダー"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"town"},"note":""},"t_station":{"id":"t_station","name":"駅ビル屋上（J3）","area":"aby_town","gx":10,"gy":1,"w":1,"h":1,"rows":["#..#############################","#..########################....#","#..............................#","#..............................#","#..............................#","#..............................#","###........................====#","###########################....#","#..............................#","#..............................#","................................","................................","................................","................................","................................","................................","##############....##############","##############....##############"],"objs":[{"id":"kr_st1","type":"enemy","x":4.5,"y":8,"kind":"kp_rifle","cond":""},{"id":"kr_st2","type":"enemy","x":12,"y":8,"kind":"kp_rifle","cond":""},{"id":"sign_4","type":"sign","x":8,"y":7.4,"label":"↓ ROTARY"},{"id":"t_station_topL","type":"entrance","x":1,"y":1.5,"mode":"A","face":1},{"id":"mem_radio","type":"memory","x":4,"y":8,"label":"破損した通信端末"}],"bg":null,"flags":{"goal":false,"pit":"吹き抜け","bgm":"town"},"note":""},"t_antenna":{"id":"t_antenna","name":"電波塔","area":"aby_town","gx":10,"gy":0,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#...................=====......#","#..............................#","#..............................#","#...........=====..............#","#..............................#","#..............................#","#..#############################","#..#############################"],"objs":[{"id":"sc_an1","type":"enemy","x":8,"y":3,"kind":"bm_scout","cond":""},{"id":"sc_an2","type":"enemy","x":13,"y":2.2,"kind":"bm_scout","cond":""},{"id":"t_antenna_fromBelow","type":"entrance","x":2.6,"y":8,"mode":"G","face":1},{"id":"pk_atk_antenna","type":"item","x":11.25,"y":5,"item":"atk_up","mode":"contact","cons":false}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"town"},"note":""},"h_ramp":{"id":"h_ramp","name":"高架入口","area":"aby_highway","gx":11,"gy":1,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","................................","................................","................................","................................","................................","................................","################################","################################"],"objs":[{"id":"cp_highway","type":"save","x":3.5,"y":8,"label":"","gate":""},{"id":"w_highway","type":"warp","x":6.5,"y":8,"label":"高架入口","gate":""},{"id":"h_ramp_fallback","type":"entrance","x":9.5,"y":8,"mode":"G","face":1},{"id":"cs_high","type":"item","x":12,"y":8,"item":"heal_item","mode":"contact","cons":true},{"id":"tr_3","type":"trace","x":10.6,"y":8,"label":"新しい足跡と落とした紙袋"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"town"},"note":""},"h_arena":{"id":"h_arena","name":"崩落点","area":"aby_highway","gx":12,"gy":1,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","...............................#","...............................#","......====...=====.............#","...............................#","...............................#","...............................#","################################","################################"],"objs":[],"bg":null,"flags":{"goal":true,"pit":"","bgm":""},"note":""},"k_check":{"id":"k_check","name":"検問所","area":"kaiser_base","gx":7,"gy":2,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","................................","................................","................................","................................","................................","................................","################################","################################"],"objs":[{"id":"kr_ck1","type":"enemy","x":5.5,"y":8,"kind":"kp_rifle","cond":""},{"id":"kr_ck2","type":"enemy","x":12.5,"y":8,"kind":"kp_rifle","cond":""},{"id":"ks_ck","type":"enemy","x":9,"y":8,"kind":"kp_shield","cond":""}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"kaiser"},"note":""},"k_yard":{"id":"k_yard","name":"前線基地・中庭","area":"kaiser_base","gx":8,"gy":2,"w":1,"h":1,"rows":["####################....########","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","................................","......=====.....................","................................","................................","................................","................................","################################","################################"],"objs":[{"id":"kr_yd1","type":"enemy","x":6,"y":8,"kind":"kp_rifle","cond":""},{"id":"kr_yd2","type":"enemy","x":13,"y":8,"kind":"kp_rifle","cond":""},{"id":"kg_yd","type":"enemy","x":9,"y":8,"kind":"kp_grenadier","cond":""},{"id":"tu_yd","type":"enemy","x":4.2,"y":5.5,"kind":"kp_turret","cond":""},{"id":"k_yard_top","type":"entrance","x":11,"y":1.5,"mode":"A","face":-1}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"kaiser"},"note":""},"k_command":{"id":"k_command","name":"指揮所","area":"kaiser_base","gx":9,"gy":2,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","................................","................................","................................","................................","................................","................................","##############HHHH##############","##############HHHH##############"],"objs":[{"id":"ks_cm","type":"enemy","x":10.5,"y":8,"kind":"kp_shield","cond":""},{"id":"kr_cm","type":"enemy","x":5.5,"y":8,"kind":"kp_rifle","cond":""},{"id":"k_command_fromBelow","type":"entrance","x":10.2,"y":8,"mode":"G","face":-1},{"id":"pk_atk_command","type":"item","x":3,"y":8,"item":"atk_up","mode":"contact","cons":false},{"id":"mem_orders","type":"memory","x":12,"y":8,"label":"カイザーの作戦指令書"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"kaiser"},"note":""},"k_rotary":{"id":"k_rotary","name":"駅前ロータリー","area":"kaiser_base","gx":10,"gy":2,"w":1,"h":1,"rows":["##############....##############","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#.######.......................#","#..............................#","#..............................#","#..............................#","................................","................................","....................====........","................................","................................","................................","################################","################################"],"objs":[{"id":"kg_rt1","type":"enemy","x":6,"y":8,"kind":"kp_grenadier","cond":""},{"id":"kg_rt2","type":"enemy","x":13.5,"y":8,"kind":"kp_grenadier","cond":""},{"id":"tu_rt","type":"enemy","x":11,"y":6,"kind":"kp_turret","cond":""},{"id":"k_rotary_top","type":"entrance","x":8,"y":1.5,"mode":"A","face":1},{"id":"pk_bd_power","type":"item","x":2.5,"y":3,"item":"badge_power","mode":"contact","cons":false}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"kaiser"},"note":""},"k_depot":{"id":"k_depot","name":"車両庫","area":"kaiser_base","gx":11,"gy":2,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","...............................#","...............................#","...............................#","...............................#","...............................#","...............................#","################################","################################"],"objs":[{"id":"kw_depot","type":"enemy","x":11.5,"y":8,"kind":"kp_walker","cond":""},{"id":"pk_hp_depot","type":"item","x":8,"y":8,"item":"hp_up","mode":"contact","cons":false}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"kaiser"},"note":""},"u_stairs":{"id":"u_stairs","name":"地下道入口","area":"bm_under","gx":6,"gy":3,"w":1,"h":1,"rows":["##############....##############","#..............................#","#..............................#","#..............................#","#.............====.............#","#..............................#","#..............................#","#..................===.........#","#..............................#","#..............................#",".......................===......","................................","................................","...................===..........","................................","................................","################################","################################"],"objs":[{"id":"sc_us","type":"enemy","x":4.5,"y":3,"kind":"bm_scout","cond":""},{"id":"u_stairs_top","type":"entrance","x":8.1,"y":1.5,"mode":"A","face":-1}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"under"},"note":""},"u_market":{"id":"u_market","name":"闇市跡","area":"bm_under","gx":5,"gy":3,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#...............................","#...............................","#...............................","#...............................","#...............................","#...............................","##############....##############","##############....##############"],"objs":[{"id":"sc_mk1","type":"enemy","x":4,"y":3,"kind":"bm_scout","cond":""},{"id":"sc_mk2","type":"enemy","x":11,"y":2.6,"kind":"bm_scout","cond":""},{"id":"sc_mk3","type":"enemy","x":13.5,"y":4,"kind":"bm_scout","cond":""},{"id":"u_market_fromBelow","type":"entrance","x":10.2,"y":8,"mode":"G","face":1},{"id":"pk_heal_market","type":"item","x":3,"y":8,"item":"healcap_up","mode":"contact","cons":false},{"id":"mem_wanted","type":"memory","x":12,"y":8,"label":"覆面水着団の手配書"}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"under"},"note":""},"u_flood":{"id":"u_flood","name":"水没区画","area":"bm_under","gx":5,"gy":4,"w":1,"h":1,"rows":["##############....##############","#..............................#","#..............................#","#..............................#","#.............====.............#","#..............................#","#..............................#","#.........===..................#","#..............................#","#..............................#","#.....====.....................#","#..............................#","#..............................#","#.........===..................#","#..............................#","#..............................#","##################..........####","##################..........####"],"objs":[{"id":"u_flood_top","type":"entrance","x":8.1,"y":1.5,"mode":"A","face":-1},{"id":"u_flood_W","type":"entrance","x":7.6,"y":8,"mode":"G","face":1},{"id":"pk_bd_heal","type":"item","x":15,"y":8,"item":"badge_heal","mode":"contact","cons":false}],"bg":null,"flags":{"goal":false,"pit":"水","bgm":"under"},"note":""},"u_canal":{"id":"u_canal","name":"地下水路","area":"bm_under","gx":7,"gy":3,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#",".......###..........===.........","................................","................................","........................===.....","................................","................................","################################","################################"],"objs":[{"id":"bb_cn1","type":"enemy","x":5,"y":1.3,"kind":"bm_bomber","cond":""},{"id":"bb_cn2","type":"enemy","x":11,"y":1.3,"kind":"bm_bomber","cond":""},{"id":"sc_cn","type":"enemy","x":8,"y":3,"kind":"bm_scout","cond":""},{"id":"pk_bd_homing","type":"item","x":4.25,"y":5.2,"item":"badge_homing","mode":"contact","cons":false},{"id":"cs_under","type":"item","x":8,"y":8,"item":"heal_item","mode":"contact","cons":true}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"under"},"note":""},"u_platform":{"id":"u_platform","name":"旧地下鉄ホーム","area":"bm_under","gx":8,"gy":3,"w":1,"h":1,"rows":["################################","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","#..............................#","................................","................................","................................","................................","................................","................................","################################","################################"],"objs":[{"id":"cp_under","type":"save","x":4,"y":8,"label":"","gate":""},{"id":"w_under","type":"warp","x":7.5,"y":8,"label":"旧地下鉄ホーム","gate":""},{"id":"pk_bd_contact","type":"item","x":12,"y":8,"item":"badge_contact","mode":"contact","cons":false}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"under"},"note":""},"u_tunnel":{"id":"u_tunnel","name":"線路","area":"bm_under","gx":9,"gy":3,"w":1,"h":1,"rows":["##############HHHH##############","#..............................#","#..............................#","#..............................#","#.............====.............#","#..............................#","#..............................#","#..................===.........#","#..............................#","#..............................#",".......................===.....#","...............................#","...............................#","...................===.........#","...............................#","...............................#","################################","################################"],"objs":[{"id":"sw_hatch","type":"switch","x":8.4,"y":2,"label":"指揮所へのハッチ","gate":"g_hatch_kaiser"},{"id":"sc_tn1","type":"enemy","x":4,"y":3,"kind":"bm_scout","cond":""},{"id":"sc_tn2","type":"enemy","x":13,"y":2,"kind":"bm_scout","cond":""},{"id":"tu_tn","type":"enemy","x":3,"y":8,"kind":"kp_turret","cond":""},{"id":"u_tunnel_top","type":"entrance","x":8.1,"y":1.5,"mode":"A","face":-1}],"bg":null,"flags":{"goal":false,"pit":"","bgm":"under"},"note":""}},"links":[{"id":"c_yard_entrance","a":"s_yard","b":"s_entrance","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_yard_sunken","a":"s_yard","b":"s_sunken","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"B","from":3,"to":7},"eb":{"side":"T","from":25,"to":29}},{"id":"c_entr_hall2","a":"s_entrance","b":"s_hall2","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"T","from":14,"to":18},"eb":{"side":"B","from":14,"to":18}},{"id":"c_entr_bikes","a":"s_entrance","b":"s_bikes","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_hall2_roof","a":"s_hall2","b":"s_roof","kind":"normal","gate":"","req":"D","rreq":"","ea":{"side":"T","from":14,"to":18},"eb":{"side":"B","from":14,"to":18}},{"id":"c_hall2_collapse","a":"s_hall2","b":"s_collapse","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_collapse_club","a":"s_collapse","b":"s_club","kind":"normal","gate":"","req":"S","rreq":"S","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_collapse_bikes","a":"s_collapse","b":"s_bikes","kind":"drop","gate":"","req":"","rreq":"","ea":{"side":"B","from":11,"to":21},"eb":{"side":"T","from":11,"to":21}},{"id":"c_club_tower","a":"s_club","b":"s_tower","kind":"normal","gate":"","req":"D","rreq":"","ea":{"side":"T","from":14,"to":18},"eb":{"side":"B","from":14,"to":18}},{"id":"c_tower_roof2","a":"s_tower","b":"s_roof2","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"L","from":3,"to":8},"eb":{"side":"R","from":3,"to":8}},{"id":"c_roof2_roof","a":"s_roof2","b":"s_roof","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"L","from":10,"to":16},"eb":{"side":"R","from":10,"to":16}},{"id":"c_bikes_gate","a":"s_bikes","b":"t_gate","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_gate_arcade","a":"t_gate","b":"t_arcade","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_arcade_cross","a":"t_arcade","b":"t_cross","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_cross_bridge","a":"t_cross","b":"t_bridge","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"T","from":4,"to":8},"eb":{"side":"B","from":4,"to":8}},{"id":"c_cross_check","a":"t_cross","b":"k_check","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_cross_under","a":"t_cross","b":"u_stairs","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"B","from":14,"to":18},"eb":{"side":"T","from":14,"to":18}},{"id":"c_bridge_roofs","a":"t_bridge","b":"t_roofs","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":6,"to":12},"eb":{"side":"L","from":6,"to":12}},{"id":"c_roofs_mixed","a":"t_roofs","b":"t_mixed","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":6,"to":12},"eb":{"side":"L","from":6,"to":12}},{"id":"c_mixed_tank","a":"t_mixed","b":"t_tank","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_mixed_yard","a":"t_mixed","b":"k_yard","kind":"drop","gate":"","req":"","rreq":"","ea":{"side":"B","from":20,"to":24},"eb":{"side":"T","from":20,"to":24}},{"id":"c_mixed_sign","a":"t_mixed","b":"t_sign","kind":"normal","gate":"","req":"D","rreq":"","ea":{"side":"T","from":14,"to":18},"eb":{"side":"B","from":14,"to":18}},{"id":"c_tank_station","a":"t_tank","b":"t_station","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_station_ramp","a":"t_station","b":"h_ramp","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_station_rotary","a":"t_station","b":"k_rotary","kind":"drop","gate":"","req":"","rreq":"","ea":{"side":"B","from":14,"to":18},"eb":{"side":"T","from":14,"to":18}},{"id":"c_station_ant","a":"t_station","b":"t_antenna","kind":"normal","gate":"","req":"SD","rreq":"","ea":{"side":"T","from":1,"to":3},"eb":{"side":"B","from":1,"to":3}},{"id":"c_ramp_arena","a":"h_ramp","b":"h_arena","kind":"oneway","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_check_yard","a":"k_check","b":"k_yard","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_yard_command","a":"k_yard","b":"k_command","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_command_rotary","a":"k_command","b":"k_rotary","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_rotary_depot","a":"k_rotary","b":"k_depot","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_tunnel_command","a":"u_tunnel","b":"k_command","kind":"shortcut","gate":"g_hatch_kaiser","req":"","rreq":"","ea":{"side":"T","from":14,"to":18},"eb":{"side":"B","from":14,"to":18}},{"id":"c_under_market","a":"u_stairs","b":"u_market","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"L","from":10,"to":16},"eb":{"side":"R","from":10,"to":16}},{"id":"c_market_flood","a":"u_market","b":"u_flood","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"B","from":14,"to":18},"eb":{"side":"T","from":14,"to":18}},{"id":"c_under_canal","a":"u_stairs","b":"u_canal","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_canal_platform","a":"u_canal","b":"u_platform","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}},{"id":"c_platform_tunnel","a":"u_platform","b":"u_tunnel","kind":"normal","gate":"","req":"","rreq":"","ea":{"side":"R","from":10,"to":16},"eb":{"side":"L","from":10,"to":16}}],"items":{"drone":{"name":"ドローン","cat":"装備","icon":"drone"},"shotgun":{"name":"ショットガン","cat":"装備","icon":"shotgun"},"hp_up":{"name":"HP強化","cat":"強化","icon":"hp"},"atk_up":{"name":"攻撃強化","cat":"強化","icon":"atk"},"healcap_up":{"name":"回復上限強化","cat":"強化","icon":"heal"},"badge_contact":{"name":"接触無効バッジ","cat":"バッジ","icon":"badge"},"badge_heal":{"name":"早業バッジ","cat":"バッジ","icon":"badge"},"badge_drone":{"name":"予備電池バッジ","cat":"バッジ","icon":"badge"},"badge_vital":{"name":"頑丈のバッジ","cat":"バッジ","icon":"badge"},"badge_power":{"name":"火力のバッジ","cat":"バッジ","icon":"badge"},"badge_homing":{"name":"追尾のバッジ","cat":"バッジ","icon":"badge"},"heal_item":{"name":"回復品","cat":"消費品","icon":"heal"}}};
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const TPU=2, CW=32, CH=18;            // 1unit=2tiles / 1セル=16x9unit=32x18tile
+const OV={W:76,H:52,m:5};             // 概要マップのセル寸法（試作の66x42+余白5）
+const TYPES={
+  solid:{jp:'通常ブロック',col:'#8c7a55'},crumble:{jp:'崩れる',col:'#b0875b'},platform:{jp:'下から通り抜け足場',col:'#4f9aa5'},
+  oneway:{jp:'一方通行',col:'#c26a8a'},hazard:{jp:'ダメージ',col:'#c0433b'},ladder:{jp:'はしご',col:'#8a6d3b'},
+  gate:{jp:'ゲート(開閉)',col:'#7c5ea6'},liquid:{jp:'水・流砂',col:'#4a86c5'},decor:{jp:'装飾(判定なし)',col:'#7a8f6a'},slope:{jp:'斜面',col:'#a08560'}};
+const BUILTIN_T=new Set(Object.keys(TYPES));
+const bty=b=>{const t=TYPES[b.type];return t?(t.base||b.type):'solid'};
+function syncTypes(){for(const k of Object.keys(TYPES))if(!BUILTIN_T.has(k))delete TYPES[k];const c=(P&&P.customTypes)||{};for(const k in c)TYPES[k]={jp:c[k].jp,col:c[k].col,base:c[k].base};if(P)for(const b of P.blocks)if(!TYPES[b.type])b.type='solid'}
+const OBJ={
+  entrance:{jp:'出入口/スポーン',col:'#2d9d78',g:'→'},respawn:{jp:'復帰地点',col:'#1d8f8f',g:'R'},save:{jp:'セーブ',col:'#e0a82e',g:'S'},
+  warp:{jp:'ワープ',col:'#9b59d0',g:'W'},item:{jp:'アイテム',col:'#e2562f',g:'◆'},enemy:{jp:'敵',col:'#c0392b',g:'E'},
+  boss:{jp:'ボス開始位置',col:'#8e1b4a',g:'B'},switch:{jp:'スイッチ',col:'#d17a22',g:'⏻'},sign:{jp:'看板',col:'#6b7f8c',g:'札'},
+  memory:{jp:'過去の品',col:'#5c7ad1',g:'過'},trace:{jp:'ヒフミの痕跡',col:'#d16ab0',g:'痕'},goal:{jp:'ゴール',col:'#2c8d3c',g:'⚑'},
+  checkpoint:{jp:'チェックポイント',col:'#3aa0c8',g:'C'}};
+const ENEMIES=['bm_scout','bm_bomber','kp_rifle','kp_grenadier','kp_turret','kp_shield','kp_walker'];
+const KINDS={normal:'通常(双方向)',drop:'落下(一方向)',oneway:'一方通行(ボス部屋等)',shortcut:'ショートカット(開通後双方向)'};
+const SIDES={L:'左',R:'右',T:'上',B:'下'};
+const OPP={L:'R',R:'L',T:'B',B:'T'};
+const CHARS='#=~^%&*+@$!?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789<>';
+const SLOPE_DEFS=[['slope_br','/','BR','◢ 斜面(右上がり45°)'],['slope_bl','j','BL','◣ 斜面(左上がり45°)'],['slope_tr','k','TR','◥ 天井斜面(右下がり)'],['slope_tl','n','TL','◤ 天井斜面(左下がり)'],
+  ['slope_r1','m','R1','右上がり緩斜面(前半)'],['slope_r2','M','R2','右上がり緩斜面(後半)'],['slope_l1','O','L1','左上がり緩斜面(前半)'],['slope_l2','o','L2','左上がり緩斜面(後半)']];
+function ensureSlopes(p){p.meta=p.meta||{};if(p.meta.slopes)return;p.meta.slopes=1;
+  const base=b=>(p.customTypes&&p.customTypes[b.type])?p.customTypes[b.type].base:b.type;if(p.blocks.some(b=>base(b)==='slope'))return;
+  const used=new Set(p.blocks.map(b=>b.ch)),ids=new Set(p.blocks.map(b=>b.id));
+  for(const[id,ch0,shape,name]of SLOPE_DEFS){if(ids.has(id))continue;let ch=ch0;if(used.has(ch))ch=[...CHARS].find(c=>!used.has(c));if(!ch)break;used.add(ch);p.blocks.push({id,ch,type:'slope',tex:'slope_a',name,col:'#a08560',img:null,cap:null,p:{shape}})}}
+const uid=p=>p+Math.random().toString(36).slice(2,7);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const clone=o=>JSON.parse(JSON.stringify(o));
+let toastT;function toast(m){let t=$('.toast');if(!t){t=document.createElement('div');t.className='toast';document.body.appendChild(t)}t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2200)}
+
+function defBlocks(){return[
+ {id:'ground_a',ch:'#',type:'solid',tex:'sand_a',name:'地面A(砂岩)',col:'#8c7a55',img:null,p:{}},
+ {id:'ground_b',ch:'b',type:'solid',tex:'sand_b',name:'地面B(舗装)',col:'#6e6a5c',img:null,p:{}},
+ {id:'crumble',ch:'c',type:'crumble',tex:'crumble_a',name:'崩れる床',col:'#b0875b',img:null,p:{delay:30}},
+ {id:'plat',ch:'=',type:'platform',tex:'plat_a',name:'足場(下から通り抜け)',col:'#4f9aa5',img:null,p:{}},
+ {id:'oneway_r',ch:'>',type:'oneway',tex:'oneway_a',name:'一方通行(→のみ)',col:'#c26a8a',img:null,p:{dir:'R'}},
+ {id:'oneway_l',ch:'<',type:'oneway',tex:'oneway_a',name:'一方通行(←のみ)',col:'#c26a8a',img:null,p:{dir:'L'}},
+ {id:'spike',ch:'^',type:'hazard',tex:'spike_a',name:'トゲ',col:'#c0433b',img:null,p:{dmg:200}},
+ {id:'ladder',ch:'L',type:'ladder',tex:'ladder_a',name:'はしご',col:'#8a6d3b',img:null,p:{}},
+ {id:'hatch',ch:'H',type:'gate',tex:'hatch_a',name:'ハッチ(ゲート)',col:'#7c5ea6',img:null,p:{gate:'g_hatch_kaiser'}},
+ {id:'water',ch:'~',type:'liquid',tex:'water_a',name:'水',col:'#4a86c5',img:null,p:{}}]}
+
+let P=null, BC={}, BI={};
+function reidx(){syncTypes();BC={};BI={};for(const b of P.blocks){BC[b.ch]=b;BI[b.id]=b}}
+function newProject(seed){
+  const p={v:1,name:'After the Blue',tpu:TPU,areas:{},blocks:defBlocks(),rooms:{},links:[],images:{},mapBg:null,items:{},sel:null,customTypes:{},meta:{}};
+  if(seed){p.areas=clone(seed.areas);p.items=clone(seed.items);p.links=clone(seed.links);
+    for(const id in seed.rooms){const r=clone(seed.rooms[id]);r.bg=null;p.rooms[id]=r}}
+  else{p.areas={a1:{name:'エリア1',col:'#3a8f98'}};}
+  ensureSlopes(p);return p}
+const room=id=>P.rooms[id];
+const rTW=r=>CW*r.w, rTH=r=>CH*r.h;
+function emptyRows(w,h){return Array.from({length:h},()=>'.'.repeat(w))}
+function tileAt(r,x,y){if(x<0||y<0||y>=r.rows.length||x>=r.rows[0].length)return'.';return r.rows[y][x]}
+function setTile(r,x,y,ch){if(x<0||y<0||y>=r.rows.length||x>=r.rows[0].length)return;const s=r.rows[y];if(s[x]!==ch)r.rows[y]=s.slice(0,x)+ch+s.slice(x+1)}
+function resizeRoom(r,w,h){const tw=CW*w,th=CH*h,n=[];for(let y=0;y<th;y++){let s=(r.rows[y]||'').slice(0,tw);s=s+'.'.repeat(tw-s.length);n.push(s)}r.rows=n;r.w=w;r.h=h;
+  r.objs=r.objs.filter(o=>o.x*TPU<=tw&&o.y*TPU<=th)}
+function cellsOf(r){const a=[];for(let j=0;j<r.h;j++)for(let i=0;i<r.w;i++)a.push([r.gx+i,r.gy+j]);return a}
+function roomAtCell(cx,cy,except){for(const id in P.rooms){if(id===except)continue;const r=P.rooms[id];if(cx>=r.gx&&cx<r.gx+r.w&&cy>=r.gy&&cy<r.gy+r.h)return r}return null}
+function addRoom(gx,gy,area){let n=1,id;do{id='room_'+(n++)}while(P.rooms[id]);
+  const r={id,name:'新しい部屋',area:area||Object.keys(P.areas)[0],gx,gy,w:1,h:1,rows:emptyRows(CW,CH),objs:[],bg:null,flags:{goal:false,pit:'',bgm:''},note:''};
+  // 外枠(床・天井・壁)を最初から置く
+  const g=P.blocks[0].ch;for(let x=0;x<CW;x++){setTile(r,x,0,g);setTile(r,x,CH-2,g);setTile(r,x,CH-1,g)}for(let y=0;y<CH;y++){setTile(r,0,y,g);setTile(r,CW-1,y,g)}
+  P.rooms[id]=r;return r}
+function linksOf(id){return P.links.filter(l=>l.a===id||l.b===id)}
+
+/* ---------- 画像 ---------- */
+const imgCache={};
+function getImg(ref){if(!ref)return null;let c=imgCache[ref];if(c)return c.complete&&c.naturalWidth?c:null;const d=P.images[ref];if(!d)return null;c=new Image();c.onload=()=>redraw();c.src=d.data;imgCache[ref]=c;return null}
+function importImage(file,max,cb){const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{let w=im.naturalWidth,h=im.naturalHeight,k=Math.min(1,max/Math.max(w,h));
+  const c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+  const png=/png|gif|webp|svg/.test(file.type)&&(max<=512||c.width*c.height<=512*512);const data=c.toDataURL(png?'image/png':'image/jpeg',.85);
+  const id=uid('img_');P.images[id]={name:file.name,w:c.width,h:c.height,data};cb(id)};im.onerror=()=>toast('画像を読み込めませんでした');im.src=fr.result};fr.readAsDataURL(file)}
+function usedImages(){const s=new Set();for(const b of P.blocks){if(b.img)s.add(b.img);if(b.cap)s.add(b.cap)}for(const id in P.rooms){const b=P.rooms[id].bg;if(b&&b.img)s.add(b.img)}if(P.mapBg&&P.mapBg.img)s.add(P.mapBg.img);return s}
+
+/* ---------- Undo / 保存 ---------- */
+const ser=()=>JSON.stringify({name:P.name,areas:P.areas,blocks:P.blocks,rooms:P.rooms,links:P.links,mapBg:P.mapBg,items:P.items,customTypes:P.customTypes||{},meta:P.meta||{}});
+let last='',undoS=[],redoS=[],dirty=false,saveT=null;
+function applyState(s){const o=JSON.parse(s);Object.assign(P,o);reidx();if(UI.room&&!P.rooms[UI.room])UI.room=null}
+function commit(){const s=ser();if(s===last)return;undoS.push(last);if(undoS.length>120)undoS.shift();last=s;redoS=[];touch()}
+function undo(){if(!undoS.length)return;redoS.push(last);last=undoS.pop();applyState(last);touch();refreshAll()}
+function redo(){if(!redoS.length)return;undoS.push(last);last=redoS.pop();applyState(last);touch();refreshAll()}
+function touch(){dirty=true;chip();clearTimeout(saveT);saveT=setTimeout(()=>saveNow(true),900);updUndo()}
+function chip(msg){const c=$('#saveChip');c.className='chip'+(dirty?' dirty':' okc');c.textContent=msg||(dirty?'未保存の変更あり':'保存済み')}
+function updUndo(){$('#bUndo').disabled=!undoS.length;$('#bRedo').disabled=!redoS.length}
+function pack(){return JSON.stringify({...JSON.parse(ser()),v:1,tpu:TPU,images:P.images})}
+/* IndexedDB (失敗時は localStorage) */
+function idb(){return new Promise((res,rej)=>{try{const q=indexedDB.open('atb-map-workshop',1);q.onupgradeneeded=()=>q.result.createObjectStore('kv');q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)}catch(e){rej(e)}})}
+async function kvSet(k,v){try{const d=await idb();await new Promise((res,rej)=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)});return true}catch(e){try{localStorage.setItem('atb:'+k,v);return true}catch(e2){return false}}}
+async function kvGet(k){try{const d=await idb();return await new Promise((res,rej)=>{const q=d.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}catch(e){try{return localStorage.getItem('atb:'+k)}catch(e2){return null}}}
+async function kvDel(k){try{const d=await idb();await new Promise(res=>{const t=d.transaction('kv','readwrite');t.objectStore('kv').delete(k);t.oncomplete=res;t.onerror=res})}catch(e){try{localStorage.removeItem('atb:'+k)}catch(e2){}}}
+async function kvKeys(){try{const d=await idb();return await new Promise((res,rej)=>{const q=d.transaction('kv').objectStore('kv').getAllKeys();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}catch(e){const a=[];try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith('atb:'))a.push(k.slice(4))}}catch(e2){}return a}}
+async function saveNow(auto){const ok=await kvSet('project',pack());if(ok){dirty=false;chip('保存済み '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}));if(!auto)toast('ブラウザに保存しました')}else{chip('保存失敗（容量不足）');toast('保存できませんでした。画像を減らすか、書き出しで控えを取ってください')}}
+async function saveVersion(label){const k='ver:'+Date.now();const ok=await kvSet(k,JSON.stringify({label,at:Date.now(),data:pack()}));toast(ok?'版を保存しました':'版の保存に失敗しました')}
+function loadPacked(txt){const o=JSON.parse(txt);if(!o.rooms||!o.blocks)throw new Error('形式が違います');
+  P={v:1,name:o.name||'After the Blue',tpu:TPU,areas:o.areas||{},blocks:o.blocks,rooms:o.rooms,links:o.links||[],images:o.images||{},mapBg:o.mapBg||null,items:o.items||{},customTypes:o.customTypes||{},meta:o.meta||{}};
+  ensureSlopes(P);
+  for(const id in P.rooms){const r=P.rooms[id];r.id=id;r.w=r.w||1;r.h=r.h||1;r.objs=r.objs||[];r.flags=r.flags||{};if(!r.rows||r.rows.length!==CH*r.h)resizeRoom(r,r.w,r.h)}
+  for(const b of P.blocks){if(b.img&&!P.images[b.img])b.img=null;if(b.cap&&!P.images[b.cap])b.cap=null}for(const id in P.rooms){const g=P.rooms[id].bg;if(g&&(!g.img||!P.images[g.img]))P.rooms[id].bg=null}if(P.mapBg&&!P.images[P.mapBg.img])P.mapBg=null;
+  reidx();for(const k in imgCache)delete imgCache[k];last=ser();undoS=[];redoS=[]}
+
+/* ===== rendering ===== */
+const UI={mode:'over',room:null,tool:'sel',selRooms:[],selLink:null,selObj:null,blk:'ground_a',otype:'save',rtool:'pen',fill:true,autoSide:true,
+  showGrid:true,showBg:true,showLinks:true,showFig:false,showNames:true,showObjs:true,showThumb:true,hoverOn:true,showCol:true,preview:false,showNb:true,hoverNb:null};
+const V={over:{x:40,y:40,z:1},room:{x:20,y:20,z:1},world:{x:20,y:20,z:1}};
+let TH={};const cv=$('#cv'),cx=cv.getContext('2d');let CWpx=0,CHpx=0,DPR=1,raf=0;
+function readTheme(){const s=getComputedStyle(document.documentElement);const g=n=>s.getPropertyValue(n).trim();
+  TH={bg:g('--canvas'),fg:g('--fg'),panel:g('--panel'),line:g('--line'),acc:g('--acc'),grid:g('--grid'),grid2:g('--grid2'),mute:g('--mute'),bad:g('--bad'),ok:g('--ok'),warn:g('--warn')}}
+function sizeCanvas(){const st=$('#stage');DPR=Math.min(2,window.devicePixelRatio||1);CWpx=st.clientWidth;CHpx=st.clientHeight;cv.width=Math.max(1,CWpx*DPR);cv.height=Math.max(1,CHpx*DPR);redraw()}
+function redraw(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;draw()})}
+function mix(hex,k,to){const n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255,t=to?255:0;const f=c=>Math.round(c+(t-c)*k);return`rgb(${f(r)},${f(g)},${f(b)})`}
+function hashStr(s){let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return Math.abs(h)}
+const ITEMICON={hp:'HP',atk:'攻',heal:'回',badge:'章',drone:'ド',shotgun:'銃'};
+function objGlyph(o){if(o.type==='item'){const it=P.items[o.item];return(it&&ITEMICON[it.icon])||'◆'}if(o.type==='enemy')return'E';return OBJ[o.type]?OBJ[o.type].g:'?'}
+
+/* --- タイル1枚 --- */
+let PREVIEW=false;
+const SLOPE_GEO={BR:{poly:[[0,1],[1,1],[1,0]],edge:[[0,1],[1,0]]},BL:{poly:[[0,0],[0,1],[1,1]],edge:[[0,0],[1,1]]},TR:{poly:[[0,0],[1,0],[1,1]],edge:[[0,0],[1,1]]},TL:{poly:[[0,0],[1,0],[0,1]],edge:[[1,0],[0,1]]},
+  R1:{poly:[[0,1],[1,.5],[1,1]],edge:[[0,1],[1,.5]]},R2:{poly:[[0,.5],[1,0],[1,1],[0,1]],edge:[[0,.5],[1,0]]},L1:{poly:[[0,0],[1,.5],[1,1],[0,1]],edge:[[0,0],[1,.5]]},L2:{poly:[[0,.5],[1,1],[0,1]],edge:[[0,.5],[1,1]]}};
+const slopeGeo=b=>SLOPE_GEO[(b.p&&b.p.shape)||'BR']||SLOPE_GEO.BR;
+function slopePath(c,b,px,py,s){c.beginPath();slopeGeo(b).poly.forEach(([x,y],i)=>c[i?'lineTo':'moveTo'](px+x*s,py+y*s));c.closePath()}
+function drawBlock(c,b,px,py,s,nb){
+  const im=getImg(b.img),cap=getImg(b.cap);
+  if(bty(b)==='platform'){
+    if(im){const h=Math.min(s*2,s*im.naturalHeight/im.naturalWidth);c.drawImage(im,px,py,s,h)}
+    else{const h=Math.max(3,s*.42);c.fillStyle=b.col||TYPES.platform.col;c.fillRect(px,py,s,h);
+      c.fillStyle='rgba(255,255,255,.6)';c.fillRect(px,py,s,Math.max(1.5,s*.14));
+      c.fillStyle='rgba(0,0,0,.4)';c.fillRect(px,py+h-Math.max(1,s*.1),s,Math.max(1,s*.1))}
+    return}
+  if(bty(b)==='slope'){const g=slopeGeo(b);c.save();slopePath(c,b,px,py,s);
+    if(im){c.clip();c.drawImage(im,px,py,s,s)}else{c.fillStyle=b.col||TYPES.slope.col;c.fill()}
+    c.restore();c.strokeStyle='rgba(255,255,255,.7)';c.lineWidth=Math.max(1,s*.1);c.beginPath();c.moveTo(px+g.edge[0][0]*s,py+g.edge[0][1]*s);c.lineTo(px+g.edge[1][0]*s,py+g.edge[1][1]*s);c.stroke();return}
+  if(im){c.drawImage(im,px,py,s,s)}
+  else{
+    const col=b.col||TYPES[b.type].col;c.fillStyle=col;
+    switch(bty(b)){
+      case'decor':c.globalAlpha=.7;c.fillRect(px,py,s,s);c.globalAlpha=1;break;
+      case'liquid':c.globalAlpha=.55;c.fillRect(px,py,s,s);c.globalAlpha=1;break;
+      case'hazard':c.beginPath();c.moveTo(px,py+s);c.lineTo(px+s*.25,py+s*.25);c.lineTo(px+s*.5,py+s);c.lineTo(px+s*.75,py+s*.25);c.lineTo(px+s,py+s);c.closePath();c.fill();break;
+      case'ladder':c.fillRect(px+s*.18,py,s*.1,s);c.fillRect(px+s*.72,py,s*.1,s);for(let i=0;i<3;i++)c.fillRect(px+s*.18,py+s*(.12+i*.32),s*.64,s*.08);break;
+      default:c.fillRect(px,py,s,s)}
+    if(s>=9){c.strokeStyle='rgba(0,0,0,.28)';c.lineWidth=1;
+      if(bty(b)==='crumble'){c.beginPath();c.moveTo(px+s*.2,py);c.lineTo(px+s*.45,py+s*.5);c.lineTo(px+s*.3,py+s);c.moveTo(px+s*.45,py+s*.5);c.lineTo(px+s*.85,py+s*.7);c.stroke()}
+      else if(bty(b)==='oneway'){c.fillStyle='rgba(255,255,255,.85)';c.font=`700 ${s*.7}px sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(b.p&&b.p.dir==='L'?'◀':b.p&&b.p.dir==='U'?'▲':b.p&&b.p.dir==='D'?'▼':'▶',px+s/2,py+s/2)}
+      else if(bty(b)==='gate'){c.beginPath();for(let i=-s;i<s;i+=s/3){c.moveTo(px+i,py+s);c.lineTo(px+i+s,py)}c.save();c.beginPath();c.rect(px,py,s,s);c.clip();c.stroke();c.restore()}
+      else if(bty(b)==='solid'){c.fillStyle='rgba(255,255,255,.14)';c.fillRect(px,py,s,Math.max(1,s*.12))}
+    }
+  }
+  if(cap&&(!nb||nb.up)){const h=Math.min(s,s*cap.naturalHeight/cap.naturalWidth);c.drawImage(cap,px,py,s,h)}
+  if(!im&&!PREVIEW&&s>=10&&b.tex){c.fillStyle=`hsl(${hashStr(b.tex)%360},70%,55%)`;c.fillRect(px,py+s-Math.max(2,s*.14),s,Math.max(2,s*.14))}
+}
+function drawRoomTiles(c,r,ox,oy,s){
+  const lite=s<5;
+  for(let y=0;y<r.rows.length;y++){const row=r.rows[y];for(let x=0;x<row.length;x++){const ch=row[x];if(ch==='.')continue;const b=BC[ch];if(!b){c.fillStyle='#f0f';c.fillRect(ox+x*s,oy+y*s,s,s);continue}
+    if(lite){c.fillStyle=b.col||TYPES[b.type].col;if(bty(b)==='platform')c.fillRect(ox+x*s,oy+y*s,s,Math.max(1,s*.4));else if(bty(b)==='slope'){slopePath(c,b,ox+x*s,oy+y*s,s);c.fill()}else c.fillRect(ox+x*s,oy+y*s,s,s)}
+    else{const u=y>0?row_(r,x,y-1):'.';drawBlock(c,b,ox+x*s,oy+y*s,s,{up:!(u!=='.'&&BC[u]&&bty(BC[u])!=='platform')})}}}}
+function row_(r,x,y){return r.rows[y][x]}
+function drawMarker(c,o,ox,oy,s,sel){
+  const d=OBJ[o.type]||{col:'#888',g:'?'},px=ox+o.x*TPU*s,py=oy+o.y*TPU*s;
+  const rr=Math.max(s*.62,2.2);
+  if(s<5){c.fillStyle=d.col;c.fillRect(px-1,py-3,2.5,3);return}
+  c.save();c.fillStyle=d.col;c.strokeStyle=sel?'#fff':'rgba(0,0,0,.45)';c.lineWidth=sel?2.5:1.2;
+  c.beginPath();c.arc(px,py-rr*1.15,rr,0,7);c.fill();c.stroke();
+  c.beginPath();c.moveTo(px-rr*.35,py-rr*.35);c.lineTo(px,py);c.lineTo(px+rr*.35,py-rr*.35);c.fillStyle=d.col;c.fill();
+  c.fillStyle='#fff';c.font=`700 ${rr*(objGlyph(o).length>1?.8:1.05)}px sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(objGlyph(o),px,py-rr*1.12);
+  c.restore()}
+function bgSize(r,im){const w=r.bg.w||CW*r.w;return[w,w*im.naturalHeight/im.naturalWidth]}
+function drawBg(c,r,ox,oy,s,front){if(!r.bg||!r.bg.img||!!r.bg.front!==!!front)return;const im=getImg(r.bg.img);if(!im)return;const[w,h]=bgSize(r,im);c.globalAlpha=r.bg.alpha??1;
+  c.drawImage(im,ox+(r.bg.x||0)*s,oy+(r.bg.y||0)*s,w*s,h*s);c.globalAlpha=1}
+/* --- 部屋の縮小画像キャッシュ --- */
+const thumbC={};
+function thumb(r){const key=r.rows.join('')+r.objs.length+(r.bg?(r.bg.front?'F':'')+r.bg.img+r.bg.x+r.bg.y+r.bg.w+r.bg.alpha+(getImg(r.bg.img)?1:0):'')+r.area+(P.areas[r.area]||{}).col+P.blocks.length+(P.blocks.map(b=>b.col+b.img+b.cap+(getImg(b.img)?1:0)+(getImg(b.cap)?1:0)).join(''));
+  let t=thumbC[r.id];if(t&&t.key===key&&!t.dirtyImg)return t.cv;
+  const s=2,w=rTW(r)*s,h=rTH(r)*s;const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');
+  const a=P.areas[r.area]||{col:'#777'};g.fillStyle=mix(a.col,.55,false);g.fillRect(0,0,w,h);
+  if(r.bg&&r.bg.img&&!getImg(r.bg.img)){}
+  drawBg(g,r,0,0,s);drawRoomTiles(g,r,0,0,s);drawBg(g,r,0,0,s,true);for(const o of r.objs)drawMarker(g,o,0,0,s);
+  thumbC[r.id]={key,cv:c};return c}
+function rrect(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath()}
+
+/* --- 概要マップの幾何 --- */
+function rectOf(r){return{x:r.gx*OV.W+OV.m,y:r.gy*OV.H+OV.m,w:r.w*OV.W-OV.m*2,h:r.h*OV.H-OV.m*2}}
+function adjPair(a,b){for(const[ax,ay]of cellsOf(a))for(const[bx,by]of cellsOf(b)){const dx=bx-ax,dy=by-ay;if(Math.abs(dx)+Math.abs(dy)===1)return{ax,ay,bx,by,dx,dy}}return null}
+function linkGeom(l){const a=room(l.a),b=room(l.b);if(!a||!b)return null;const p=adjPair(a,b);
+  if(p){const m=OV.m;let x,y,w,h;
+    if(p.dx!==0){x=Math.max(p.ax,p.bx)*OV.W-m;y=p.ay*OV.H+OV.H/2-11;w=m*2;h=22}
+    else{x=p.ax*OV.W+OV.W/2-17;y=Math.max(p.ay,p.by)*OV.H-m;w=34;h=m*2}
+    return{adj:true,x,y,w,h,cx:x+w/2,cy:y+h/2,dx:p.dx,dy:p.dy}}
+  const ra=rectOf(a),rb=rectOf(b),ax=ra.x+ra.w/2,ay=ra.y+ra.h/2,bx=rb.x+rb.w/2,by=rb.y+rb.h/2;
+  return{adj:false,ax,ay,bx,by,cx:(ax+bx)/2,cy:(ay+by)/2,dx:Math.sign(bx-ax),dy:Math.sign(by-ay)}}
+function tri(c,x,y,dx,dy,sz,col){c.save();c.translate(x,y);c.rotate(Math.atan2(dy,dx));c.beginPath();c.moveTo(sz,0);c.lineTo(-sz*.7,-sz*.75);c.lineTo(-sz*.7,sz*.75);c.closePath();c.fillStyle=col;c.fill();c.restore()}
+function worldToScr(v,x,y){return[x*v.z+v.x,y*v.z+v.y]}
+function scrToWorld(v,x,y){return[(x-v.x)/v.z,(y-v.y)/v.z]}
+function begin(v){cx.setTransform(DPR,0,0,DPR,0,0);cx.fillStyle=TH.bg;cx.fillRect(0,0,CWpx,CHpx);cx.setTransform(DPR*v.z,0,0,DPR*v.z,DPR*v.x,DPR*v.y)}
+
+let drag=null,hoverRoom=null,hoverLink=null,mouse={x:0,y:0};
+function drawOverview(){
+  const v=V.over;begin(v);
+  if(P.mapBg&&P.mapBg.img&&UI.showBg){const im=getImg(P.mapBg.img);if(im){cx.globalAlpha=P.mapBg.alpha??.5;cx.drawImage(im,P.mapBg.x||0,P.mapBg.y||0,im.naturalWidth*(P.mapBg.scale||1),im.naturalHeight*(P.mapBg.scale||1));cx.globalAlpha=1}}
+  // grid
+  const x0=Math.floor(-v.x/v.z/OV.W)-1,x1=Math.ceil((CWpx-v.x)/v.z/OV.W)+1,y0=Math.floor(-v.y/v.z/OV.H)-1,y1=Math.ceil((CHpx-v.y)/v.z/OV.H)+1;
+  cx.strokeStyle=TH.grid;cx.lineWidth=1/v.z;cx.beginPath();for(let i=x0;i<=x1;i++){cx.moveTo(i*OV.W,y0*OV.H);cx.lineTo(i*OV.W,y1*OV.H)}for(let j=y0;j<=y1;j++){cx.moveTo(x0*OV.W,j*OV.H);cx.lineTo(x1*OV.W,j*OV.H)}cx.stroke();
+  // links
+  for(const l of P.links){const g=linkGeom(l);if(!g)continue;const sel=UI.selLink===l.id,hov=hoverLink===l.id;const col=sel?TH.acc:hov?TH.acc:TH.mute;
+    cx.fillStyle=col;cx.strokeStyle=col;
+    if(g.adj){if(l.kind==='shortcut'){cx.globalAlpha=.55}cx.fillRect(g.x,g.y,g.w,g.h);cx.globalAlpha=1}
+    else{cx.lineWidth=3;cx.setLineDash(l.kind==='shortcut'?[3,4]:[8,5]);cx.beginPath();cx.moveTo(g.ax,g.ay);cx.lineTo(g.bx,g.by);cx.stroke();cx.setLineDash([])}
+    if(l.kind==='drop'||l.kind==='oneway'){const a=room(l.a),b=room(l.b);let dx=g.dx,dy=g.dy;if(!g.adj){const ex=g.bx-g.ax,ey=g.by-g.ay;dx=ex;dy=ey}else{const pa=adjPair(a,b);dx=pa.dx;dy=pa.dy}
+      tri(cx,g.cx,g.cy,dx,dy,5.5,sel||hov?'#fff':TH.fg)}
+    if(sel){cx.lineWidth=2/v.z;cx.strokeStyle='#fff';if(g.adj)cx.strokeRect(g.x-2,g.y-2,g.w+4,g.h+4)}}
+  // rooms
+  const selSet=new Set(UI.selRooms);
+  for(const id in P.rooms){const r=P.rooms[id];let rc=rectOf(r);let dx=0,dy=0;
+    if(drag&&drag.k==='move'&&selSet.has(id)){dx=drag.dx*OV.W;dy=drag.dy*OV.H}
+    const a=P.areas[r.area]||{col:'#777'};
+    cx.save();rrect(cx,rc.x+dx,rc.y+dy,rc.w,rc.h,9);cx.fillStyle=mix(a.col,.5,false);cx.fill();cx.clip();
+    if(UI.showThumb){const t=thumb(r);cx.globalAlpha=.95;cx.drawImage(t,rc.x+dx,rc.y+dy,rc.w,rc.h);cx.globalAlpha=1}
+    cx.restore();
+    rrect(cx,rc.x+dx,rc.y+dy,rc.w,rc.h,9);cx.lineWidth=selSet.has(id)?3:2;cx.strokeStyle=selSet.has(id)?'#fff':hoverRoom===id?TH.acc:a.col;cx.stroke();
+    if(selSet.has(id)){rrect(cx,rc.x+dx-2,rc.y+dy-2,rc.w+4,rc.h+4,11);cx.lineWidth=1.5;cx.strokeStyle=TH.acc;cx.stroke()}
+    // 記号
+    const sx=rc.x+dx,sy=rc.y+dy;cx.font='700 9px sans-serif';cx.textBaseline='middle';cx.textAlign='center';
+    const has=t=>r.objs.some(o=>o.type===t);
+    const sym=(ch,x,y,col)=>{cx.fillStyle=col;cx.beginPath();cx.arc(x,y,6,0,7);cx.fill();cx.fillStyle='#fff';cx.fillText(ch,x,y+.5)};
+    if(has('save'))sym('S',sx+9,sy+rc.h-9,'#d39a1d');if(has('warp'))sym('W',sx+rc.w-9,sy+rc.h-9,'#8e4dc4');if(r.flags&&r.flags.goal)sym('⚑',sx+rc.w-9,sy+9,'#2c8d3c');
+    const its=r.objs.filter(o=>o.type==='item'&&!o.cons).length;if(its)sym(its>1?'◆'+its:'◆',sx+9,sy+9,'#d9482a');
+    if(UI.showNames&&v.z>=.8){cx.font='500 9px "Zen Kaku Gothic New",sans-serif';const lw=Math.min(rc.w-4,cx.measureText(r.name).width+8);cx.fillStyle='rgba(10,20,26,.72)';rrect(cx,sx+rc.w/2-lw/2,sy+rc.h/2-7,lw,14,5);cx.fill();cx.fillStyle='#fff';cx.fillText(r.name.length>9&&rc.w<80?r.name.slice(0,8)+'…':r.name,sx+rc.w/2,sy+rc.h/2+.5)}}
+  if(UI.merge)UI.mergeSel.forEach((id,i)=>{const r=room(id);if(!r)return;const rc=rectOf(r);rrect(cx,rc.x-3,rc.y-3,rc.w+6,rc.h+6,12);cx.lineWidth=3;cx.strokeStyle=TH.warn;cx.setLineDash([6,4]);cx.stroke();cx.setLineDash([]);cx.fillStyle=TH.warn;cx.beginPath();cx.arc(rc.x+rc.w-6,rc.y+6,8,0,7);cx.fill();cx.fillStyle='#000';cx.font='700 10px sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(i+1,rc.x+rc.w-6,rc.y+6.5)});
+  // ドラッグ中ゴースト
+  if(drag&&drag.k==='move'){for(const id of UI.selRooms){const r=room(id),rc=rectOf({...r,gx:r.gx+drag.dx,gy:r.gy+drag.dy});rrect(cx,rc.x,rc.y,rc.w,rc.h,9);cx.setLineDash([5,4]);cx.lineWidth=2;cx.strokeStyle=drag.ok?TH.ok:TH.bad;cx.stroke();cx.setLineDash([])}}
+  if(drag&&drag.k==='box'){cx.strokeStyle=TH.acc;cx.lineWidth=1/v.z;cx.setLineDash([4,3]);cx.strokeRect(drag.x0,drag.y0,drag.x1-drag.x0,drag.y1-drag.y0);cx.setLineDash([])}
+  if(drag&&drag.k==='link')drawLinkPreview();
+  if(UI.tool==='add'&&!drag){const [wx,wy]=scrToWorld(v,mouse.x,mouse.y),gx=Math.floor(wx/OV.W),gy=Math.floor(wy/OV.H);if(!roomAtCell(gx,gy)){rrect(cx,gx*OV.W+OV.m,gy*OV.H+OV.m,OV.W-OV.m*2,OV.H-OV.m*2,9);cx.setLineDash([5,4]);cx.lineWidth=2;cx.strokeStyle=TH.acc;cx.stroke();cx.setLineDash([])}}
+}
+
+/* --- 全体マップ --- */
+const WU={W:CW,H:CH};  // 1セル=32x18 tile
+function drawWorld(){
+  const v=V.world;begin(v);const s=1;
+  for(const id in P.rooms){const r=P.rooms[id],ox=r.gx*CW,oy=r.gy*CH,w=rTW(r),h=rTH(r),a=P.areas[r.area]||{col:'#777'};
+    cx.fillStyle=mix(a.col,.62,false);cx.fillRect(ox,oy,w,h);
+    if(UI.showBg)drawBg(cx,r,ox,oy,1);
+    drawRoomTiles(cx,r,ox,oy,1);drawBg(cx,r,ox,oy,1,true);
+    if(UI.showObjs)for(const o of r.objs)drawMarker(cx,o,ox,oy,v.z>3?1:Math.max(1,1.6/v.z*.6));
+    cx.lineWidth=1.2/v.z;cx.strokeStyle=a.col;cx.strokeRect(ox,oy,w,h);
+    if(UI.selRooms.includes(id)){cx.lineWidth=2.5/v.z;cx.strokeStyle='#fff';cx.strokeRect(ox,oy,w,h)}
+    if(UI.showNames){const fs=Math.max(10/v.z,3);cx.font=`700 ${fs}px "Zen Kaku Gothic New",sans-serif`;cx.textAlign='left';cx.textBaseline='top';cx.fillStyle='rgba(8,16,22,.7)';const tw=cx.measureText(r.name).width+fs;cx.fillRect(ox+1,oy+1,tw,fs*1.5);cx.fillStyle='#fff';cx.fillText(r.name,ox+1+fs/2,oy+1+fs*.2)}}
+  if(UI.showLinks)for(const l of P.links){const a=room(l.a),b=room(l.b);if(!a||!b)continue;
+    const pt=(r,e)=>{const ox=r.gx*CW,oy=r.gy*CH,w=rTW(r),h=rTH(r),m=(e.from+e.to)/2;return e.side==='L'?[ox,oy+m]:e.side==='R'?[ox+w,oy+m]:e.side==='T'?[ox+m,oy]:[ox+m,oy+h]};
+    const[p1x,p1y]=pt(a,l.ea),[p2x,p2y]=pt(b,l.eb);cx.strokeStyle=l.kind==='shortcut'?'#c8a2ff':'#ffd966';cx.lineWidth=2/v.z;cx.setLineDash([4/v.z,3/v.z]);cx.beginPath();cx.moveTo(p1x,p1y);cx.lineTo(p2x,p2y);cx.stroke();cx.setLineDash([]);
+    cx.fillStyle='#ffd966';cx.beginPath();cx.arc(p1x,p1y,2.2/v.z*1.5,0,7);cx.arc(p2x,p2y,2.2/v.z*1.5,0,7);cx.fill()}
+}
+function draw(){if(!P)return;PREVIEW=!!UI.preview&&UI.mode==='room';cx.setTransform(1,0,0,1,0,0);
+  if(UI.mode==='over')drawOverview();else if(UI.mode==='world')drawWorld();else drawRoomEd();
+  if(UI.mode==='room'&&!UI.room){}}
+
+/* ===== 概要/全体マップ 操作 ===== */
+function fitView(mode){const v=V[mode==='world'?'world':'over'];const rs=Object.values(P.rooms);if(!rs.length||!CWpx)return;
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;const uw=mode==='world'?CW:OV.W,uh=mode==='world'?CH:OV.H;
+  for(const r of rs){x0=Math.min(x0,r.gx*uw);y0=Math.min(y0,r.gy*uh);x1=Math.max(x1,(r.gx+r.w)*uw);y1=Math.max(y1,(r.gy+r.h)*uh)}
+  const pad=36;const z=Math.min((CWpx-pad*2)/(x1-x0),(CHpx-pad*2)/(y1-y0),mode==='world'?8:3);v.z=Math.max(.05,z);v.x=(CWpx-(x1-x0)*v.z)/2-x0*v.z;v.y=(CHpx-(y1-y0)*v.z)/2-y0*v.z;redraw()}
+function hitRoomW(wx,wy){const uw=UI.mode==='world'?CW:OV.W,uh=UI.mode==='world'?CH:OV.H;const cx_=Math.floor(wx/uw),cy_=Math.floor(wy/uh);const r=roomAtCell(cx_,cy_);
+  if(!r)return null;if(UI.mode==='over'){const rc=rectOf(r);if(wx<rc.x-OV.m*.6||wx>rc.x+rc.w+OV.m*.6||wy<rc.y-OV.m*.6||wy>rc.y+rc.h+OV.m*.6)return null}return r.id}
+function hitLinkW(wx,wy){const z=V.over.z;for(const l of P.links){const g=linkGeom(l);if(!g)continue;
+  if(g.adj){if(wx>=g.x-2&&wx<=g.x+g.w+2&&wy>=g.y-2&&wy<=g.y+g.h+2)return l.id}
+  else{const dx=g.bx-g.ax,dy=g.by-g.ay,t=clamp(((wx-g.ax)*dx+(wy-g.ay)*dy)/(dx*dx+dy*dy||1),0,1);if(Math.hypot(g.ax+dx*t-wx,g.ay+dy*t-wy)<6/z)return l.id}}return null}
+const DEFR={L:[10,16],R:[10,16],T:[14,18],B:[14,18]};
+function setSides(l){const a=room(l.a),b=room(l.b),p=a&&b&&adjPair(a,b);if(!p)return false;
+  const sa=p.dx===1?'R':p.dx===-1?'L':p.dy===1?'B':'T',sb=OPP[sa];let ch=false;
+  if(l.ea.side!==sa){if('LR'.includes(l.ea.side)!==('LR'.includes(sa))){l.ea.from=DEFR[sa][0];l.ea.to=DEFR[sa][1]}l.ea.side=sa;ch=true}
+  if(l.eb.side!==sb){if('LR'.includes(l.eb.side)!==('LR'.includes(sb))){l.eb.from=DEFR[sb][0];l.eb.to=DEFR[sb][1]}l.eb.side=sb;ch=true}
+  return ch}
+function mkLink(a,b){const ra=room(a),rb=room(b);const p=adjPair(ra,rb);let sa='R';
+  if(p)sa=p.dx===1?'R':p.dx===-1?'L':p.dy===1?'B':'T';else{const dx=(rb.gx-ra.gx),dy=(rb.gy-ra.gy);sa=Math.abs(dx)>=Math.abs(dy)?(dx>=0?'R':'L'):(dy>=0?'B':'T')}
+  const sb=OPP[sa];let n=1,id;do{id='c_'+a+'__'+b+(n>1?'_'+n:'');n++}while(P.links.some(l=>l.id===id));
+  const l={id,a,b,kind:'normal',gate:'',req:'',rreq:'',ea:{side:sa,from:DEFR[sa][0],to:DEFR[sa][1]},eb:{side:sb,from:DEFR[sb][0],to:DEFR[sb][1]}};P.links.push(l);return l}
+function canMove(dx,dy){const sel=new Set(UI.selRooms);for(const id of sel){const r=room(id);for(const[x,y]of cellsOf(r)){const o=roomAtCell(x+dx,y+dy);if(o&&!sel.has(o.id))return false}}return true}
+let panning=null,spaceDown=false;
+function evPos(e){const b=cv.getBoundingClientRect();return[e.clientX-b.left,e.clientY-b.top]}
+function ovDown(e,x,y,wx,wy){
+  if(UI.tool==='add'){const gx=Math.floor(wx/OV.W),gy=Math.floor(wy/OV.H);if(!roomAtCell(gx,gy)){const r=addRoom(gx,gy);UI.selRooms=[r.id];UI.selLink=null;commit();refreshAll();toast('部屋を追加しました。ダブルクリックで詳細を開きます')}return}
+  const id=hitRoomW(wx,wy);
+  if(UI.merge){if(id)mergePick(id);return}
+  const c0=[Math.floor(wx/OV.W),Math.floor(wy/OV.H)];
+  if(UI.tool==='link'){if(id){drag={k:'link',from:id,c0,wx,wy,del:e.shiftKey}}return}
+  if(id){UI.selLink=null;if(e.shiftKey){const i=UI.selRooms.indexOf(id);if(i>=0)UI.selRooms.splice(i,1);else UI.selRooms.push(id)}else if(!UI.selRooms.includes(id))UI.selRooms=[id];
+    drag={k:'move',sx:wx,sy:wy,dx:0,dy:0,ok:true,moved:false};
+    drag.lpT=setTimeout(()=>{if(drag&&drag.k==='move'&&!drag.moved){drag={k:'link',from:id,c0,wx:drag.sx,wy:drag.sy,del:false,lp:true};toast('つなぎモード：直線上へドラッグして離すと間の部屋をつなぎます（Shiftで切断）');redraw()}},450);
+    refreshPanels();return}
+  const lid=hitLinkW(wx,wy);if(lid){UI.selLink=lid;UI.selRooms=[];refreshPanels();redraw();return}
+  if(!e.shiftKey){UI.selRooms=[];UI.selLink=null;refreshPanels()}
+  if(e.pointerType==='touch'){panning={x,y,vx:V.over.x,vy:V.over.y}}else drag={k:'box',x0:wx,y0:wy,x1:wx,y1:wy}}
+function ovMove(e,x,y,wx,wy){
+  if(drag){
+    if(drag.k==='move'){const dx=Math.round((wx-drag.sx)/OV.W),dy=Math.round((wy-drag.sy)/OV.H);
+      if(Math.abs(wx-drag.sx)+Math.abs(wy-drag.sy)>4)drag.moved=true;
+      if(dx!==drag.dx||dy!==drag.dy){drag.dx=dx;drag.dy=dy}drag.ok=canMove(drag.dx,drag.dy)}
+    else if(drag.k==='box'){drag.x1=wx;drag.y1=wy}
+    else if(drag.k==='link'){drag.wx=wx;drag.wy=wy;drag.del=e.shiftKey}
+    redraw();hideHover();return}
+  const id=hitRoomW(wx,wy);const lid=id?null:hitLinkW(wx,wy);
+  if(id!==hoverRoom||lid!==hoverLink){hoverRoom=id;hoverLink=lid;redraw()}
+  cv.style.cursor=UI.tool==='add'?'copy':UI.tool==='link'?(id?'crosshair':'default'):id?'grab':lid?'pointer':'default';
+  if(id&&UI.hoverOn)showHover(id,x,y);else hideHover()}
+function ovUp(e,x,y,wx,wy){
+  if(!drag)return;const d=drag;drag=null;if(d.lpT)clearTimeout(d.lpT);
+  if(d.k==='move'){if(d.moved&&d.ok&&(d.dx||d.dy)){for(const id of UI.selRooms){const r=room(id);r.gx+=d.dx;r.gy+=d.dy}
+      let n=0;if(UI.autoSide)for(const l of P.links)if(UI.selRooms.includes(l.a)||UI.selRooms.includes(l.b))if(setSides(l))n++;
+      commit();refreshAll();if(n)toast(n+'件の接続の向きを位置に合わせました')}else if(d.moved&&!d.ok)toast('他の部屋と重なるため移動できません')}
+  else if(d.k==='box'){const xa=Math.min(d.x0,d.x1),xb=Math.max(d.x0,d.x1),ya=Math.min(d.y0,d.y1),yb=Math.max(d.y0,d.y1);const sel=e.shiftKey?UI.selRooms.slice():[];
+    for(const id in P.rooms){const rc=rectOf(P.rooms[id]);if(rc.x<xb&&rc.x+rc.w>xa&&rc.y<yb&&rc.y+rc.h>ya&&!sel.includes(id))sel.push(id)}UI.selRooms=sel;refreshPanels()}
+  else if(d.k==='link'){d.wx=wx;d.wy=wy;execLink(planLink(d,wx,wy),e.shiftKey||d.del)}
+  redraw()}
+/* --- ホバー拡大 --- */
+let hovId=null;
+function showHover(id,x,y){const r=room(id);const h=$('#hover');
+  const maxW=Math.min(440,Math.max(220,CWpx*.46)),k=maxW/rTW(r),w=Math.round(maxW),hh=Math.round(rTH(r)*k);
+  if(hovId!==id||h.hidden){hovId=id;const a=P.areas[r.area]||{name:r.area,col:'#777'};
+    h.innerHTML=`<div class="t"><b>${esc(r.name)}</b><span class="mono" style="color:var(--mute)">${esc(r.id)}</span></div><canvas width="${w*2}" height="${hh*2}" style="width:${w}px;height:${hh}px"></canvas><div class="hint" style="margin-top:4px"><span class="dot" style="display:inline-block;background:${a.col}"></span> ${esc(a.name)} ・ ${r.objs.length}個のオブジェクト</div>`;
+    const c=h.querySelector('canvas').getContext('2d');c.scale(2,2);c.fillStyle=mix((a.col),.55,false);c.fillRect(0,0,w,hh);drawBg(c,r,0,0,k);drawRoomTiles(c,r,0,0,k);drawBg(c,r,0,0,k,true);
+    c.strokeStyle='rgba(255,255,255,.07)';c.lineWidth=1;c.beginPath();for(let gx=0;gx<=rTW(r);gx+=2){c.moveTo(gx*k,0);c.lineTo(gx*k,hh)}for(let gy=0;gy<=rTH(r);gy+=2){c.moveTo(0,gy*k);c.lineTo(w,gy*k)}c.stroke();
+    for(const o of r.objs)drawMarker(c,o,0,0,k);h.hidden=false}
+  const bw=h.offsetWidth,bh=h.offsetHeight;let px=x+18,py=y+14;if(px+bw>CWpx-6)px=x-bw-18;if(px<6)px=6;if(py+bh>CHpx-6)py=CHpx-bh-6;if(py<6)py=6;h.style.left=px+'px';h.style.top=py+'px'}
+function hideHover(){const h=$('#hover');if(!h.hidden){h.hidden=true;hovId=null}}
+/* --- 全体マップ操作 --- */
+function woDown(e,x,y,wx,wy){const id=hitRoomW(wx,wy);if(id){UI.selRooms=[id];UI.selLink=null;refreshPanels();redraw()}else{UI.selRooms=[];panning={x,y,vx:V.world.x,vy:V.world.y}}}
+function woMove(e,x,y,wx,wy){const id=hitRoomW(wx,wy);if(id!==hoverRoom){hoverRoom=id;redraw()}cv.style.cursor=id?'pointer':'default';if(id&&UI.hoverOn&&e.buttons===0)showHover(id,x,y);else hideHover()}
+/* --- ポインタ統合 --- */
+cv.addEventListener('contextmenu',e=>e.preventDefault());
+cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const[x,y]=evPos(e);mouse={x,y};const v=V[UI.mode];
+  if(e.button===1||e.button===2&&UI.mode!=='room'||spaceDown||(e.button===0&&e.altKey)){panning={x,y,vx:v.x,vy:v.y};cv.style.cursor='grabbing';return}
+  const[wx,wy]=scrToWorld(v,x,y);
+  if(UI.mode==='over')ovDown(e,x,y,wx,wy);else if(UI.mode==='world')woDown(e,x,y,wx,wy);else roomDown(e,x,y,wx,wy)});
+cv.addEventListener('pointermove',e=>{const[x,y]=evPos(e);mouse={x,y};const v=V[UI.mode];
+  if(panning){v.x=panning.vx+(x-panning.x);v.y=panning.vy+(y-panning.y);hideHover();redraw();return}
+  const[wx,wy]=scrToWorld(v,x,y);
+  if(UI.mode==='over')ovMove(e,x,y,wx,wy);else if(UI.mode==='world')woMove(e,x,y,wx,wy);else roomMove(e,x,y,wx,wy)});
+const endP=e=>{const[x,y]=evPos(e);const v=V[UI.mode];if(panning){panning=null;cv.style.cursor='default';return}
+  const[wx,wy]=scrToWorld(v,x,y);if(UI.mode==='over')ovUp(e,x,y,wx,wy);else if(UI.mode==='room')roomUp(e,x,y,wx,wy)};
+cv.addEventListener('pointerup',endP);cv.addEventListener('pointercancel',endP);
+cv.addEventListener('pointerleave',()=>{hideHover();if(hoverRoom){hoverRoom=null;redraw()}});
+cv.addEventListener('dblclick',e=>{const[x,y]=evPos(e);if(UI.mode==='room'){const[wx,wy]=scrToWorld(V.room,x,y),m=nbAt(wx,wy);if(m)switchRoom(m.r.id);return}const[wx,wy]=scrToWorld(V[UI.mode],x,y);const id=hitRoomW(wx,wy);if(id)openRoom(id)});
+cv.addEventListener('wheel',e=>{e.preventDefault();const[x,y]=evPos(e);const v=V[UI.mode];const k=Math.exp(-e.deltaY*(e.ctrlKey?.01:.0016));
+  const lim=UI.mode==='room'?[.3,8]:UI.mode==='world'?[.08,14]:[.25,5];const nz=clamp(v.z*k,lim[0],lim[1]);const[wx,wy]=scrToWorld(v,x,y);v.z=nz;v.x=x-wx*nz;v.y=y-wy*nz;hideHover();redraw()},{passive:false});
+
+/* ===== 部屋詳細エディタ ===== */
+const TS=16;let hoverT=null,rdrag=null,clip=null,SEL=null;
+function curRoom(){return UI.room?room(UI.room):null}
+function endOf(l,which){return which==='a'?l.ea:l.eb}
+function roomEnds(r){const a=[];for(const l of P.links){if(l.a===r.id)a.push({l,w:'a',e:l.ea,other:l.b});if(l.b===r.id)a.push({l,w:'b',e:l.eb,other:l.a})}return a}
+function edgeBlocked(r,e){let n=0;const tw=rTW(r),th=rTH(r);for(let i=Math.floor(e.from);i<Math.ceil(e.to);i++){const x=e.side==='L'?0:e.side==='R'?tw-1:i,y=e.side==='T'?0:e.side==='B'?th-1:i;const bt=BC[tileAt(r,x,y)];if(bt&&(bty(bt)==='solid'||bty(bt)==='crumble'))n++}return n}
+function barRect(r,e){const w=rTW(r)*TS,h=rTH(r)*TS,a=e.from*TS,b=e.to*TS;
+  return e.side==='L'?{x:-13,y:a,w:11,h:b-a}:e.side==='R'?{x:w+2,y:a,w:11,h:b-a}:e.side==='T'?{x:a,y:-13,w:b-a,h:11}:{x:a,y:h+2,w:b-a,h:11}}
+const NBG=44;
+function nbList(r){const out=[];if(!UI.showNb)return out;const rc=cellsOf(r);
+  for(const id in P.rooms){if(id===r.id)continue;const n=P.rooms[id];
+    if(!cellsOf(n).some(([x,y])=>rc.some(([a,b])=>Math.max(Math.abs(x-a),Math.abs(y-b))<=1)))continue;
+    const dx=n.gx>=r.gx+r.w?NBG:n.gx+n.w<=r.gx?-NBG:0,dy=n.gy>=r.gy+r.h?NBG:n.gy+n.h<=r.gy?-NBG:0;
+    out.push({r:n,ox:(n.gx-r.gx)*CW*TS+dx,oy:(n.gy-r.gy)*CH*TS+dy})}return out}
+function nbAt(wx,wy){const r=curRoom();if(!r)return null;for(const m of nbList(r)){if(wx>=m.ox&&wx<=m.ox+rTW(m.r)*TS&&wy>=m.oy&&wy<=m.oy+rTH(m.r)*TS)return m}return null}
+function switchRoom(id){const r=room(id);if(!r)return;const z=V.room.z;UI.room=id;UI.selRooms=[id];UI.selObj=null;UI.selLink=null;UI.hoverNb=null;SEL=null;hoverT=null;
+  V.room.x=CWpx/2-rTW(r)*TS*z/2;V.room.y=CHpx/2-rTH(r)*TS*z/2;refreshAll();toast(r.name+' に移動しました')}
+function fitNeighbors(){const r=curRoom();if(!r||!CWpx)return;let x0=0,y0=0,x1=rTW(r)*TS,y1=rTH(r)*TS;
+  for(const m of nbList(r)){x0=Math.min(x0,m.ox);y0=Math.min(y0,m.oy);x1=Math.max(x1,m.ox+rTW(m.r)*TS);y1=Math.max(y1,m.oy+rTH(m.r)*TS)}
+  const z=Math.max(.15,Math.min((CWpx-80)/(x1-x0),(CHpx-80)/(y1-y0)));V.room.z=z;V.room.x=(CWpx-(x1-x0)*z)/2-x0*z;V.room.y=(CHpx-(y1-y0)*z)/2-y0*z;redraw()}
+function drawNeighbors(r){const v=V.room,nb=nbList(r),map=new Map(nb.map(m=>[m.r.id,m]));
+  for(const{r:n,ox,oy}of nb){const a=P.areas[n.area]||{col:'#777'},w=rTW(n)*TS,h=rTH(n)*TS,hov=UI.hoverNb===n.id;
+    cx.save();cx.globalAlpha=hov?.9:.62;cx.fillStyle=mix(a.col,.5,false);cx.fillRect(ox,oy,w,h);if(UI.showBg)drawBg(cx,n,ox,oy,TS);drawRoomTiles(cx,n,ox,oy,TS);drawBg(cx,n,ox,oy,TS,true);if(UI.showObjs)for(const o of n.objs)drawMarker(cx,o,ox,oy,TS);cx.restore();
+    cx.lineWidth=(hov?3:1.5)/v.z;cx.strokeStyle=hov?TH.acc:a.col;cx.strokeRect(ox,oy,w,h);
+    const fs=Math.max(11/v.z,6),txt=n.name+(hov?'  ▶ ダブルクリックで移動':'');cx.font=`700 ${fs}px "Zen Kaku Gothic New",sans-serif`;cx.textAlign='left';cx.textBaseline='top';
+    const tw=cx.measureText(txt).width+fs;cx.fillStyle='rgba(8,16,22,.78)';cx.fillRect(ox+3/v.z,oy+3/v.z,tw,fs*1.6);cx.fillStyle='#fff';cx.fillText(txt,ox+3/v.z+fs/2,oy+3/v.z+fs*.25)}
+  // 接続の整合チェック（橋）
+  const cw=rTW(r)*TS,ch=rTH(r)*TS;
+  for(const q of roomEnds(r)){const m=map.get(q.other);if(!m)continue;const n=m.r,eo=q.l.a===r.id?q.l.eb:q.l.ea,ec=q.e,nw=rTW(n)*TS,nh=rTH(n)*TS,lc='LR'.includes(ec.side),lo='LR'.includes(eo.side);
+    const pc=lc?{p:ec.side==='R'?cw:0,a:ec.from*TS,b:ec.to*TS}:{p:ec.side==='B'?ch:0,a:ec.from*TS,b:ec.to*TS};
+    const po=lo?{p:m.ox+(eo.side==='R'?nw:0),a:m.oy+eo.from*TS,b:m.oy+eo.to*TS}:{p:m.oy+(eo.side==='B'?nh:0),a:m.ox+eo.from*TS,b:m.ox+eo.to*TS};
+    const ok=lc===lo&&OPP[ec.side]===eo.side&&Math.abs(pc.a-po.a)<1&&Math.abs(pc.b-po.b)<1,col=ok?TH.ok:TH.warn;
+    cx.save();cx.fillStyle=col;cx.strokeStyle=col;cx.globalAlpha=ok?.28:.4;cx.beginPath();
+    if(lc&&lo){cx.moveTo(pc.p,pc.a);cx.lineTo(po.p,po.a);cx.lineTo(po.p,po.b);cx.lineTo(pc.p,pc.b)}
+    else if(!lc&&!lo){cx.moveTo(pc.a,pc.p);cx.lineTo(po.a,po.p);cx.lineTo(po.b,po.p);cx.lineTo(pc.b,pc.p)}
+    else{const x1=lc?pc.p:(pc.a+pc.b)/2,y1=lc?(pc.a+pc.b)/2:pc.p,x2=lo?po.p:(po.a+po.b)/2,y2=lo?(po.a+po.b)/2:po.p;cx.lineWidth=4/v.z;cx.moveTo(x1,y1);cx.lineTo(x2,y2);cx.stroke()}
+    cx.closePath();cx.fill();cx.globalAlpha=1;cx.lineWidth=1.5/v.z;cx.setLineDash([5/v.z,4/v.z]);cx.stroke();cx.setLineDash([]);
+    if(!ok){const mx=lc?(pc.p+po.p)/2:(pc.a+pc.b+po.a+po.b)/4,my=lc?(pc.a+pc.b+po.a+po.b)/4:(pc.p+po.p)/2;cx.fillStyle=TH.warn;cx.font=`700 ${14/v.z}px sans-serif`;cx.textAlign='center';cx.textBaseline='middle';cx.fillText('⚠ ずれ',mx,my)}
+    cx.restore()}}
+function drawRoomEd(){
+  const r=curRoom(),v=V.room;begin(v);
+  if(!r){cx.setTransform(DPR,0,0,DPR,0,0);cx.fillStyle=TH.mute;cx.font='14px "Zen Kaku Gothic New",sans-serif';cx.textAlign='center';cx.fillText('概要マップで部屋をダブルクリック、または左の一覧から部屋を選んでください',CWpx/2,CHpx/2);return}
+  const w=rTW(r)*TS,h=rTH(r)*TS,a=P.areas[r.area]||{col:'#777'};
+  if(!PREVIEW)drawNeighbors(r);
+  if(!PREVIEW){cx.fillStyle=mix(a.col,.82,true);cx.globalAlpha=.35;cx.fillRect(0,0,w,h);cx.globalAlpha=1;
+  cx.fillStyle=document.documentElement.dataset.theme==='dark'||matchMedia('(prefers-color-scheme:dark)').matches&&document.documentElement.dataset.theme!=='light'?'rgba(10,18,24,.55)':'rgba(255,255,255,.55)';cx.fillRect(0,0,w,h);}
+  else{cx.fillStyle=mix(a.col,.5,false);cx.fillRect(0,0,w,h)}
+  if(UI.showBg)drawBg(cx,r,0,0,TS);
+  if(UI.showGrid&&!PREVIEW&&TS*v.z>=7){cx.lineWidth=1/v.z;cx.strokeStyle=TH.grid;cx.beginPath();for(let x=0;x<=rTW(r);x++)if(x%2){cx.moveTo(x*TS,0);cx.lineTo(x*TS,h)}for(let y=0;y<=rTH(r);y++)if(y%2){cx.moveTo(0,y*TS);cx.lineTo(w,y*TS)}cx.stroke();
+    cx.strokeStyle=TH.grid2;cx.beginPath();for(let x=0;x<=rTW(r);x+=2){cx.moveTo(x*TS,0);cx.lineTo(x*TS,h)}for(let y=0;y<=rTH(r);y+=2){cx.moveTo(0,y*TS);cx.lineTo(w,y*TS)}cx.stroke()}
+  drawRoomTiles(cx,r,0,0,TS);drawBg(cx,r,0,0,TS,true);
+  if(UI.showCol&&!PREVIEW)colLines(r);
+  if(PREVIEW){cx.lineWidth=1/v.z;cx.strokeStyle=TH.line;cx.strokeRect(0,0,w,h);return}
+  // セル境界
+  cx.strokeStyle=TH.acc;cx.globalAlpha=.5;cx.lineWidth=1.5/v.z;cx.setLineDash([6/v.z,4/v.z]);cx.beginPath();for(let i=1;i<r.w;i++){cx.moveTo(i*CW*TS,0);cx.lineTo(i*CW*TS,h)}for(let j=1;j<r.h;j++){cx.moveTo(0,j*CH*TS);cx.lineTo(w,j*CH*TS)}cx.stroke();cx.setLineDash([]);cx.globalAlpha=1;
+  cx.lineWidth=2/v.z;cx.strokeStyle=TH.fg;cx.strokeRect(0,0,w,h);
+  // 目盛り
+  if(TS*v.z>=9){cx.fillStyle=TH.mute;cx.font=`${10/v.z}px "JetBrains Mono",monospace`;cx.textAlign='center';cx.textBaseline='bottom';for(let x=0;x<rTW(r);x+=4)cx.fillText(x,x*TS+TS/2,-11/v.z-2);cx.textAlign='right';cx.textBaseline='middle';for(let y=0;y<rTH(r);y+=4)cx.fillText(y,-12/v.z-2,y*TS+TS/2)}
+  // 出入口
+  for(const q of roomEnds(r)){const b=barRect(r,q.e),bl=edgeBlocked(r,q.e);cx.fillStyle=bl?TH.bad:TH.ok;cx.fillRect(b.x,b.y,b.w,b.h);
+    if(UI.selLink===q.l.id){cx.strokeStyle='#fff';cx.lineWidth=2/v.z;cx.strokeRect(b.x-1,b.y-1,b.w+2,b.h+2);cx.fillStyle='#fff';const hs=4/v.z,lr=q.e.side==='L'||q.e.side==='R',pts=lr?[[b.x+b.w/2,b.y],[b.x+b.w/2,b.y+b.h]]:[[b.x,b.y+b.h/2],[b.x+b.w,b.y+b.h/2]];for(const[hx,hy]of pts)cx.fillRect(hx-hs,hy-hs,hs*2,hs*2)}
+    cx.fillStyle=bl?TH.bad:TH.ok;cx.globalAlpha=.16;const d=TS;const ix=q.e.side==='R'?w-d:b.x+(q.e.side==='L'?9:0),iy=q.e.side==='B'?h-d:b.y+(q.e.side==='T'?9:0);
+    cx.fillRect('LR'.includes(q.e.side)?ix:b.x,'LR'.includes(q.e.side)?b.y:iy,'LR'.includes(q.e.side)?d:b.w,'LR'.includes(q.e.side)?b.h:d);cx.globalAlpha=1;
+    const o=room(q.other);cx.fillStyle=TH.fg;cx.font=`500 ${11/v.z}px "Zen Kaku Gothic New",sans-serif`;cx.textBaseline='middle';
+    const lab=(q.e.side==='L'?'← ':q.e.side==='R'?'→ ':q.e.side==='T'?'↑ ':'↓ ')+(o?o.name:q.other);
+    if(q.e.side==='L'){cx.textAlign='right';cx.fillText(lab,b.x-4/v.z,b.y+b.h/2)}else if(q.e.side==='R'){cx.textAlign='left';cx.fillText(lab,b.x+b.w+4/v.z,b.y+b.h/2)}
+    else{cx.textAlign='center';cx.fillText(lab,b.x+b.w/2,q.e.side==='T'?b.y-8/v.z:b.y+b.h+9/v.z)}}
+  // オブジェクト
+  if(UI.showObjs&&!PREVIEW)for(const o of r.objs)drawMarker(cx,o,0,0,TS,UI.selObj===o.id);
+  // プレビュー
+  const ch=rdrag&&rdrag.ch;
+  if(rdrag&&(rdrag.k==='line'||rdrag.k==='rect')){const cells=shapeCells(rdrag);cx.globalAlpha=.65;for(const[x,y]of cells){if(ch==='.'){cx.fillStyle='rgba(255,60,60,.4)';cx.fillRect(x*TS,y*TS,TS,TS)}else drawBlock(cx,BC[ch],x*TS,y*TS,TS)}cx.globalAlpha=1}
+  if(hoverT&&!rdrag&&['pen','erase','fill','line','rect'].includes(UI.rtool)){const[x,y]=hoverT;cx.globalAlpha=.55;if(UI.rtool==='erase'){cx.strokeStyle=TH.bad;cx.lineWidth=2/v.z;cx.strokeRect(x*TS,y*TS,TS,TS)}else if(BI[UI.blk]){drawBlock(cx,BI[UI.blk],x*TS,y*TS,TS)}cx.globalAlpha=1}
+  if(hoverT&&UI.rtool==='obj'&&!rdrag){const d=OBJ[UI.otype];cx.globalAlpha=.6;drawMarker(cx,{type:UI.otype,x:(hoverT[0]+.5)/TPU,y:(hoverT[1]+1)/TPU,item:'hp_up'},0,0,TS,false);cx.globalAlpha=1}
+  if(SEL){const px=SEL.x*TS,py=SEL.y*TS;if(SEL.buf){cx.globalAlpha=.8;for(let j=0;j<SEL.buf.length;j++)for(let i=0;i<SEL.buf[j].length;i++){const c=SEL.buf[j][i];if(c!=='.'&&BC[c])drawBlock(cx,BC[c],px+i*TS,py+j*TS,TS)}cx.globalAlpha=1}
+    cx.strokeStyle=TH.acc;cx.lineWidth=2/v.z;cx.setLineDash([5/v.z,3/v.z]);cx.strokeRect(px,py,SEL.w*TS,SEL.h*TS);cx.setLineDash([]);cx.fillStyle=TH.acc;cx.globalAlpha=.1;cx.fillRect(px,py,SEL.w*TS,SEL.h*TS);cx.globalAlpha=1}
+  if(UI.showFig&&hoverT){const[x,y]=hoverT,fx=(x+.5)*TS,fy=(y+1)*TS;cx.fillStyle='rgba(255,200,60,.55)';cx.strokeStyle='#b8860b';cx.lineWidth=1.5/v.z;cx.fillRect(fx-.6*TS,fy-2.8*TS,1.2*TS,2.8*TS);cx.strokeRect(fx-.6*TS,fy-2.8*TS,1.2*TS,2.8*TS);
+    cx.setLineDash([5/v.z,4/v.z]);cx.strokeStyle='#e8a317';for(const dir of[1,-1]){cx.beginPath();for(let i=0;i<=40;i++){const t=i/40*8,yy=-4*(1-((t-4)/4)**2);cx[i?'lineTo':'moveTo'](fx+dir*t*TS,fy+yy*TS)}cx.stroke()}cx.setLineDash([])}
+}
+function colLines(r){cx.lineWidth=Math.max(1.5,2.2/V.room.z);cx.strokeStyle='#37e08a';cx.beginPath();
+  for(let y=0;y<r.rows.length;y++)for(let x=0;x<r.rows[y].length;x++){const b=BC[r.rows[y][x]];if(!b)continue;
+    if(bty(b)==='platform'){cx.moveTo(x*TS,y*TS);cx.lineTo((x+1)*TS,y*TS)}
+    else if(bty(b)==='slope'){const g=slopeGeo(b);cx.moveTo(x*TS+g.edge[0][0]*TS,y*TS+g.edge[0][1]*TS);cx.lineTo(x*TS+g.edge[1][0]*TS,y*TS+g.edge[1][1]*TS)}
+    else if((bty(b)==='solid'||bty(b)==='crumble')){const u=y>0?BC[r.rows[y-1][x]]:null;if(!u||['platform','ladder','liquid','decor'].includes(bty(u))){cx.moveTo(x*TS,y*TS);cx.lineTo((x+1)*TS,y*TS)}}}
+  cx.stroke()}
+function shapeCells(d){const a=[];const[x0,y0]=d.start,[x1,y1]=d.cur;
+  if(d.k==='line'){let x=x0,y=y0;const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy;for(;;){a.push([x,y]);if(x===x1&&y===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x+=sx}if(e2<=dx){e+=dx;y+=sy}}}
+  else{const xa=Math.min(x0,x1),xb=Math.max(x0,x1),ya=Math.min(y0,y1),yb=Math.max(y0,y1);for(let y=ya;y<=yb;y++)for(let x=xa;x<=xb;x++)if(UI.fill||x===xa||x===xb||y===ya||y===yb)a.push([x,y])}
+  return a}
+function floodFill(r,x,y,ch){const t=tileAt(r,x,y);if(t===ch)return;const tw=rTW(r),th=rTH(r),st=[[x,y]];let n=0;while(st.length&&n<40000){const[a,b]=st.pop();if(a<0||b<0||a>=tw||b>=th||tileAt(r,a,b)!==t)continue;setTile(r,a,b,ch);n++;st.push([a+1,b],[a-1,b],[a,b+1],[a,b-1])}}
+function uniqObjId(type){const all=new Set();for(const id in P.rooms)for(const o of P.rooms[id].objs)all.add(o.id);let n=1,id;do{id=type+'_'+(n++)}while(all.has(id));return id}
+function snapObj(wx,wy){return{x:(Math.floor(wx/TS)+.5)/TPU,y:(Math.floor(wy/TS)+1)/TPU}}
+function objAt(r,wx,wy){for(let i=r.objs.length-1;i>=0;i--){const o=r.objs[i],px=o.x*TPU*TS,py=o.y*TPU*TS,rr=TS*.62;if(Math.hypot(wx-px,wy-(py-rr*1.15))<=rr*1.25||Math.hypot(wx-px,wy-py)<rr*.6)return o}return null}
+function barAt(r,wx,wy){for(const q of roomEnds(r)){const b=barRect(r,q.e),m=5;if(wx>=b.x-m&&wx<=b.x+b.w+m&&wy>=b.y-m&&wy<=b.y+b.h+m)return q}return null}
+function stampSel(){if(!SEL||!SEL.buf)return;const r=curRoom();for(let j=0;j<SEL.buf.length;j++)for(let i=0;i<SEL.buf[j].length;i++)if(SEL.buf[j][i]!=='.')setTile(r,SEL.x+i,SEL.y+j,SEL.buf[j][i]);SEL.buf=null;commit()}
+function selRows(){const r=curRoom(),a=[];for(let j=0;j<SEL.h;j++){let s='';for(let i=0;i<SEL.w;i++)s+=tileAt(r,SEL.x+i,SEL.y+j);a.push(s)}return a}
+function clearSel(){const r=curRoom();for(let j=0;j<SEL.h;j++)for(let i=0;i<SEL.w;i++)setTile(r,SEL.x+i,SEL.y+j,'.')}
+function roomDown(e,x,y,wx,wy){const r=curRoom();if(!r)return;const tx=Math.floor(wx/TS),ty=Math.floor(wy/TS);
+  if(nbAt(wx,wy))return;
+  const bar=e.button===0&&barAt(r,wx,wy);
+  if(bar){UI.selLink=bar.l.id;UI.selObj=null;const pp=('LR'.includes(bar.e.side)?wy:wx)/TS,len=bar.e.to-bar.e.from;let mode='move';if(len>=3&&Math.abs(pp-bar.e.from)<.8)mode='from';else if(len>=3&&Math.abs(pp-bar.e.to)<.8)mode='to';rdrag={k:'bar',q:bar,mode,off:pp-bar.e.from};refreshPanels();redraw();return}
+  const t=UI.rtool;
+  if(e.button===2){const o=objAt(r,wx,wy);if(o){r.objs=r.objs.filter(q=>q!==o);UI.selObj=null;commit();refreshAll();return}rdrag={k:'pen',ch:'.',last:[tx,ty]};setTile(r,tx,ty,'.');redraw();return}
+  if(t==='pen'||t==='erase'){const b=BI[UI.blk];if(t==='pen'&&!b){toast('ブロックを選んでください');return}rdrag={k:'pen',ch:t==='erase'?'.':b.ch,last:[tx,ty]};setTile(r,tx,ty,rdrag.ch)}
+  else if(t==='line'||t==='rect'){const b=BI[UI.blk];rdrag={k:t,ch:e.shiftKey||!b?'.':b.ch,start:[tx,ty],cur:[tx,ty]}}
+  else if(t==='fill'){const b=BI[UI.blk];if(b){floodFill(r,tx,ty,e.shiftKey?'.':b.ch);commit()}}
+  else if(t==='pick'){const c=tileAt(r,tx,ty);if(c!=='.'&&BC[c]){UI.blk=BC[c].id;UI.rtool='pen';refreshAll()}}
+  else if(t==='obj'){const o=objAt(r,wx,wy);if(o){UI.selObj=o.id;UI.selLink=null;rdrag={k:'obj',o,moved:false};refreshPanels()}else{const p=snapObj(wx,wy);const o2={id:uniqObjId(UI.otype),type:UI.otype,x:p.x,y:p.y,label:''};
+      if(UI.otype==='item'){o2.item='hp_up';o2.mode='contact'}if(UI.otype==='enemy')o2.kind='bm_scout';if(UI.otype==='entrance'){o2.mode='G';o2.face=1}
+      r.objs.push(o2);UI.selObj=o2.id;commit();refreshAll()}}
+  else if(t==='sel'){const ob=objAt(r,wx,wy);if(ob){UI.selObj=ob.id;rdrag={k:'obj',o:ob,moved:false};refreshPanels();redraw();return}
+    if(SEL&&tx>=SEL.x&&tx<SEL.x+SEL.w&&ty>=SEL.y&&ty<SEL.y+SEL.h){if(!SEL.buf){SEL.buf=selRows();clearSel()}rdrag={k:'movesel',g:[tx,ty],moved:false}}
+    else{if(SEL&&SEL.buf)stampSel();SEL={x:tx,y:ty,w:1,h:1,buf:null};rdrag={k:'newsel',x0:tx,y0:ty}}}
+  else if(t==='bg'){if(!r.bg||!r.bg.img){toast('先に背景画像を読み込んでください');return}rdrag={k:'bg',sx:wx,sy:wy,bx:r.bg.x||0,by:r.bg.y||0}}
+  redraw()}
+function roomMove(e,x,y,wx,wy){const r=curRoom();if(!r)return;const tx=Math.floor(wx/TS),ty=Math.floor(wy/TS);
+  const nbh=rdrag?null:nbAt(wx,wy),hid=nbh?nbh.r.id:null;if(hid!==UI.hoverNb){UI.hoverNb=hid;redraw()}
+  if(nbh){cv.style.cursor='pointer';const c=$('#coord');if(c)c.textContent='ダブルクリック: 「'+nbh.r.name+'」へ移動';return}
+  if(!hoverT||hoverT[0]!==tx||hoverT[1]!==ty){hoverT=[tx,ty];const inb=tx>=0&&ty>=0&&tx<rTW(r)&&ty<rTH(r);$('#coord')&&($('#coord').textContent=inb?`tile (${tx}, ${ty})  unit (${(tx/TPU).toFixed(1)}, ${(ty/TPU).toFixed(1)})  ${inb&&tileAt(r,tx,ty)!=='.'?(BC[tileAt(r,tx,ty)]||{id:'?'}).id:''}`:'')}
+  if(rdrag){const d=rdrag;
+    if(d.k==='pen'){const[lx,ly]=d.last;const c=shapeCells({k:'line',start:[lx,ly],cur:[tx,ty]});for(const[a,b]of c)setTile(r,a,b,d.ch);d.last=[tx,ty]}
+    else if(d.k==='line'||d.k==='rect')d.cur=[tx,ty];
+    else if(d.k==='bar'){const e2=d.q.e,lr='LR'.includes(e2.side),lim=lr?rTH(r):rTW(r),pp=(lr?wy:wx)/TS;if(d.mode==='from')e2.from=clamp(Math.round(pp),0,e2.to-1);else if(d.mode==='to')e2.to=clamp(Math.round(pp),e2.from+1,lim);else{const len=e2.to-e2.from,f=clamp(Math.round(pp-d.off),0,lim-len);e2.from=f;e2.to=f+len}d.moved=true}
+    else if(d.k==='obj'){const p=snapObj(wx,wy);if(p.x!==d.o.x||p.y!==d.o.y){d.o.x=p.x;d.o.y=p.y;d.moved=true}}
+    else if(d.k==='newsel'){SEL.x=Math.min(d.x0,tx);SEL.y=Math.min(d.y0,ty);SEL.w=Math.abs(tx-d.x0)+1;SEL.h=Math.abs(ty-d.y0)+1}
+    else if(d.k==='movesel'){SEL.x+=tx-d.g[0];SEL.y+=ty-d.g[1];d.g=[tx,ty];d.moved=true}
+    else if(d.k==='bg'){r.bg.x=+(d.bx+(wx-d.sx)/TS).toFixed(1);r.bg.y=+(d.by+(wy-d.sy)/TS).toFixed(1)}}
+  cv.style.cursor=spaceDown?'grab':(UI.rtool==='obj'||UI.rtool==='sel')&&objAt(r,wx,wy)?'move':(q=>q?('LR'.includes(q.e.side)?'ns-resize':'ew-resize'):'crosshair')(barAt(r,wx,wy));redraw()}
+function roomUp(e,x,y,wx,wy){const r=curRoom(),d=rdrag;rdrag=null;if(!r||!d)return;
+  if(d.k==='line'||d.k==='rect'){for(const[a,b]of shapeCells(d))setTile(r,a,b,d.ch);commit()}
+  else if(d.k==='pen'||d.k==='bar'||d.k==='obj'||d.k==='bg'){commit();if(d.k!=='pen')refreshPanels()}
+  else if(d.k==='movesel'){stampSel()}
+  redraw()}
+
+/* ===== パネル ===== */
+const L_=$('#leftP'),R_=$('#rightP');
+const sw=(b,on)=>`<button class="sw${on?' on':''}" data-blk="${esc(b.id)}" title="${esc(b.name)}"><canvas width="60" height="30" data-sw="${esc(b.id)}"></canvas><span class="id">${esc(b.id)}</span><span class="ty">${TYPES[b.type].jp} ・ ${esc(b.tex||'-')}</span></button>`;
+function paintSw(){$$('canvas[data-sw]').forEach(c=>{const b=BI[c.dataset.sw];if(!b)return;const g=c.getContext('2d');g.clearRect(0,0,60,30);for(let i=0;i<3;i++){drawBlock(g,b,i*20,0,20)}g.save();g.beginPath();g.rect(0,20,60,10);g.clip();g.restore();})}
+function roomOpts(sel){return Object.values(P.rooms).sort((a,b)=>a.gx-b.gx||a.gy-b.gy).map(r=>`<option value="${esc(r.id)}"${r.id===sel?' selected':''}>${esc(r.name)} (${esc(r.id)})</option>`).join('')}
+function areaOpts(sel){return Object.keys(P.areas).map(k=>`<option value="${esc(k)}"${k===sel?' selected':''}>${esc(P.areas[k].name)}</option>`).join('')}
+const ck=(id,t,on)=>`<label class="row" style="gap:6px"><input type="checkbox" data-ck="${id}"${on?' checked':''}> ${t}</label>`;
+function leftHTML(){
+  if(UI.mode==='over'){
+    const rs=Object.values(P.rooms).sort((a,b)=>(P.areas[a.area]?.name||'').localeCompare(P.areas[b.area]?.name||'')||a.gy-b.gy||a.gx-b.gx);
+    return`<div class="sec"><h3>ツール</h3><div class="tools" style="grid-template-columns:repeat(3,1fr)">
+      <button data-tool="sel" class="${UI.tool==='sel'?'on':''}">選択・移動</button><button data-tool="add" class="${UI.tool==='add'?'on':''}">部屋を追加</button><button data-tool="link" class="${UI.tool==='link'?'on':''}">つなぐ</button></div>
+      <div class="hint">部屋をドラッグで移動（中身は変わりません）。ダブルクリックで詳細。右ドラッグ/Space+ドラッグで画面移動、ホイールで拡大縮小。</div>
+      ${ck('autoSide','移動時、出入口の向きを位置に合わせる',UI.autoSide)}${ck('hoverOn','ホバーで中身を拡大表示',UI.hoverOn)}${ck('showThumb','部屋の中身を縮小表示',UI.showThumb)}${ck('showNames','部屋名を表示',UI.showNames)}
+      <button data-act="fit">全体を画面に合わせる</button><button data-act="mergeMode" class="${UI.merge?'on':''}">部屋を合成（M）</button><div class="hint">合成: Mを押す→隣どうしの部屋をクリック→Enterで決定。中身はそのまま結合されます。</div></div>
+    <div class="sec"><h3>部屋一覧 (${rs.length})</h3><input type="text" id="rsearch" placeholder="検索…"><div class="list" id="rlist">${rs.map(r=>`<button data-room="${esc(r.id)}" class="${UI.selRooms.includes(r.id)?'on':''}"><span class="dot" style="background:${(P.areas[r.area]||{col:'#777'}).col}"></span>${esc(r.name)}</button>`).join('')}</div></div>
+    <div class="sec"><h3>エリア（部屋の種類）</h3>${Object.keys(P.areas).map(k=>`<div class="row"><input type="color" data-ac="${esc(k)}" value="${P.areas[k].col}" style="width:34px;padding:0;height:28px"><input type="text" data-an="${esc(k)}" value="${esc(P.areas[k].name)}"><button class="bad" data-act="delArea" data-k="${esc(k)}" title="エリアを削除">${UI.arm==='area:'+k?'本当に？':'✕'}</button></div>`).join('')}<button data-act="addArea">エリアを追加</button></div>
+    <div class="sec"><h3>概要マップの下絵</h3><input type="file" id="mapBgFile" accept="image/*" hidden><button data-act="mapBg">画像を読み込む</button>
+      ${P.mapBg?`<div class="row"><label>透明度</label><input type="range" min="0.05" max="1" step="0.05" value="${P.mapBg.alpha??.5}" data-mb="alpha"></div><div class="row"><label>倍率</label><input type="range" min="0.2" max="4" step="0.05" value="${P.mapBg.scale||1}" data-mb="scale"></div><div class="row"><label>X/Y</label><input type="number" value="${P.mapBg.x||0}" data-mb="x"><input type="number" value="${P.mapBg.y||0}" data-mb="y"></div><button class="bad" data-act="mapBgDel">下絵を外す</button>`:''}</div>`}
+  if(UI.mode==='world'){
+    return`<div class="sec"><h3>全体マップ</h3><div class="hint">全部屋の実際の地形をつなげて表示します（閲覧用）。クリックで選択、ダブルクリックで編集。</div>
+      ${ck('showNames','部屋名',UI.showNames)}${ck('showObjs','オブジェクト',UI.showObjs)}${ck('showBg','背景画像',UI.showBg)}${ck('showLinks','接続線（出入口どうし）',UI.showLinks)}${ck('hoverOn','ホバーで拡大',UI.hoverOn)}
+      <button data-act="fit">全体を画面に合わせる</button><button data-act="fit1">選択した部屋へ寄る</button></div>`}
+  const r=curRoom();
+  return`<div class="sec"><h3>部屋</h3><div class="row"><button data-act="prevRoom">◀</button><select id="roomSel" style="flex:1">${roomOpts(UI.room)}</select><button data-act="nextRoom">▶</button></div></div>
+  <div class="sec"><h3>ツール</h3><div class="tools">${[['pen','鉛筆','P'],['erase','消しゴム','E'],['line','直線','L'],['rect','矩形','R'],['fill','塗り','F'],['pick','スポイト','I'],['sel','範囲','S'],['obj','物体','O'],['bg','背景移動','B']].map(([k,t,h])=>`<button data-rt="${k}" class="${UI.rtool===k?'on':''}" title="${h}">${t}</button>`).join('')}</div>
+    ${ck('fill','矩形は塗りつぶす',UI.fill)}<div class="hint">左ドラッグで描画 / 右ドラッグで消す / Shift+直線・矩形は消去。範囲: Ctrl+C/X/V、Delete、H=左右反転。</div></div>
+  <div class="sec"><h3>ブロック</h3><div class="pal">${P.blocks.map(b=>sw(b,b.id===UI.blk)).join('')}</div><div class="row"><button data-act="newBlock">＋追加</button><button data-act="editBlock">編集</button><button class="bad" data-act="delBlock">${UI.arm==='blk:'+UI.blk?'本当に削除？':'削除'}</button><button data-act="typesModal">種類</button></div></div>
+  <div class="sec"><h3>オブジェクト</h3><div class="pal" style="grid-template-columns:repeat(auto-fill,minmax(88px,1fr))">${Object.keys(OBJ).map(k=>`<button class="${UI.otype===k&&UI.rtool==='obj'?'on':''}" data-ot="${k}" style="display:flex;gap:5px;align-items:center;font-size:12px;padding:4px 6px"><span class="dot" style="background:${OBJ[k].col}"></span>${OBJ[k].jp}</button>`).join('')}</div><div class="hint">空中のタイルをクリック → そのタイルの下端に置かれます。</div></div>
+  <div class="sec"><h3>表示</h3>${ck('showNb','隣の部屋を表示（接続の整合チェック付き）',UI.showNb)}${ck('showGrid','グリッド',UI.showGrid)}${ck('showBg','背景画像',UI.showBg)}${ck('showObjs','オブジェクト',UI.showObjs)}${ck('preview','プレビュー表示（グリッド・記号を隠してゲーム画面に近づける） <kbd>V</kbd>',UI.preview)}${ck('showCol','乗れる面の線（緑）',UI.showCol)}${ck('showFig','プレイヤーの大きさ＋ジャンプ到達範囲',UI.showFig)}<button data-act="fit">部屋を画面に合わせる</button><button data-act="fitNb">周囲の部屋も含めて表示</button><div class="hint">隣の部屋をダブルクリックすると、その部屋に切り替わります。緑の帯=出入口が一致、橙=ずれ。</div></div>`}
+function fld(label,scope,key,val,type,extra){return`<div class="row"><label>${label}</label><input type="${type||'text'}" data-p="${scope}.${key}" value="${esc(val)}"${extra||''}></div>`}
+function sel_(label,scope,key,val,opts){return`<div class="row"><label>${label}</label><select data-p="${scope}.${key}">${opts.map(([v,t])=>`<option value="${esc(v)}"${String(v)===String(val)?' selected':''}>${esc(t)}</option>`).join('')}</select></div>`}
+function endHTML(sc,l,e){const nm=room(sc==='ea'?l.a:l.b);return`<div class="sec" style="border:1px solid var(--line);border-radius:8px;padding:8px"><b style="font-size:12px">${esc(nm?nm.name:'?')} 側の出入口</b>
+  ${sel_('辺',sc,'side',e.side,Object.entries(SIDES))}<div class="row"><label>範囲(tile)</label><input type="number" data-p="${sc}.from" value="${e.from}" step="1"><input type="number" data-p="${sc}.to" value="${e.to}" step="1"></div>${nm?`<div class="row"><button data-act="carve" data-w="${sc}">壁を開ける${edgeBlocked(nm,e)?` (${edgeBlocked(nm,e)}枚が塞いでいる)`:''}</button></div>`:''}</div>`}
+function detailHTML(){
+  let h='';const r=curRoom();
+  const selR=UI.mode==='room'?r:UI.selRooms.length===1?room(UI.selRooms[0]):null;
+  if(UI.selLink&&P.links.find(l=>l.id===UI.selLink)){const l=P.links.find(l=>l.id===UI.selLink);
+    h+=`<div class="sec"><h3>接続</h3><div class="mono">${esc(l.id)}</div><div class="row"><b>${esc(room(l.a)?.name)}</b> ⇄ <b>${esc(room(l.b)?.name)}</b></div>
+      <div class="hint">部屋詳細の緑/赤の帯をドラッグで移動、両端で長さを変更。赤は壁タイルで塞がっている印です。</div>${sel_('種類','link','kind',l.kind,Object.entries(KINDS))}${fld('ゲートID','link','gate',l.gate)}${fld('必要能力 a→b','link','req',l.req)}${fld('必要能力 b→a','link','rreq',l.rreq)}${endHTML('ea',l,l.ea)}${endHTML('eb',l,l.eb)}
+      <div class="row"><button data-act="swapLink">a⇄b 入れ替え</button><button data-act="autoLink">位置から辺を自動設定</button></div><button class="bad" data-act="delLink">この接続を削除</button></div>`}
+  else if(UI.mode!=='over'&&UI.mode==='room'&&UI.selObj&&r&&r.objs.find(o=>o.id===UI.selObj)){const o=r.objs.find(o=>o.id===UI.selObj);
+    h+=`<div class="sec"><h3>オブジェクト</h3>${fld('ID','obj','id',o.id)}${sel_('種類','obj','type',o.type,Object.keys(OBJ).map(k=>[k,OBJ[k].jp]))}
+      <div class="row"><label>x,y (unit)</label><input type="number" step="0.25" data-p="obj.x" value="${o.x}"><input type="number" step="0.25" data-p="obj.y" value="${o.y}"></div>
+      ${fld('ラベル','obj','label',o.label||'')}
+      ${o.type==='enemy'?`<div class="row"><label>敵ID</label><input type="text" list="enemyList" data-p="obj.kind" value="${esc(o.kind||'')}"><datalist id="enemyList">${ENEMIES.map(e=>`<option>${e}</option>`).join('')}</datalist></div>${fld('出現条件','obj','cond',o.cond||'')}`:''}
+      ${o.type==='item'?sel_('アイテム','obj','item',o.item,Object.keys(P.items).map(k=>[k,`${P.items[k].name}（${P.items[k].cat}）`]))+sel_('取得','obj','mode',o.mode||'contact',[['contact','接触'],['interact','調べる']]):''}
+      ${['switch','save','warp','entrance'].includes(o.type)?fld('ゲートID','obj','gate',o.gate||''):''}
+      <div class="row"><button data-act="dupObj">複製</button><button class="bad" data-act="delObj">削除</button></div></div>`}
+  else if(selR){const rr=selR;
+    h+=`<div class="sec"><h3>部屋</h3>${fld('名前','room','name',rr.name)}${fld('ID','room','id',rr.id,'text',' spellcheck="false"')}${sel_('エリア','room','area',rr.area,Object.keys(P.areas).map(k=>[k,P.areas[k].name]))}
+      <div class="row"><label>大きさ</label><input type="number" min="1" max="6" data-p="room.w" value="${rr.w}"><span>×</span><input type="number" min="1" max="6" data-p="room.h" value="${rr.h}"><span class="hint">セル</span></div>
+      <div class="row"><label>配置</label><input type="number" data-p="room.gx" value="${rr.gx}"><input type="number" data-p="room.gy" value="${rr.gy}"></div>
+      <div class="row"><label>BGM</label><input type="text" data-p="flag.bgm" value="${esc(rr.flags?.bgm||'')}"></div><div class="row"><label>落下名</label><input type="text" data-p="flag.pit" value="${esc(rr.flags?.pit||'')}" placeholder="流砂/水 など"></div>
+      <label class="row" style="gap:6px"><input type="checkbox" data-p="flag.goal"${rr.flags?.goal?' checked':''}> ゴール部屋</label>
+      <div class="row"><label>メモ</label></div><textarea data-p="room.note" rows="3" style="font-family:var(--ui);font-size:13px">${esc(rr.note||'')}</textarea>
+      <div class="hint">${rTW(rr)}×${rTH(rr)} tile ／ ${rr.objs.length} objects ／ 接続 ${linksOf(rr.id).length}</div>
+      <div class="row">${UI.mode==='room'?'<button data-act="carveAll">出入口の壁を全部開ける</button>':''}${UI.mode!=='room'?'<button class="pri" data-act="openSel">詳細を開く</button>':''}<button data-act="dupRoom">複製</button><button class="bad" data-act="delRoom">削除</button></div></div>`;
+    h+=connList(rr);
+    if(UI.mode==='room'){const bg=rr.bg;h+=`<div class="sec"><h3>この部屋の背景画像</h3><input type="file" id="bgFile" accept="image/*" hidden><button data-act="roomBg">画像を読み込む</button><div class="hint">画面へのドラッグ＆ドロップ、Ctrl+V貼り付けでも入ります。</div>${bg&&bg.img?`
+      <div class="row"><label>幅(tile)</label><input type="number" data-p="bg.w" value="${bg.w||CW*rr.w}"></div><div class="row"><label>位置 x,y</label><input type="number" data-p="bg.x" value="${bg.x||0}"><input type="number" data-p="bg.y" value="${bg.y||0}"></div>
+      <div class="row"><label>透明度</label><input type="range" min="0.05" max="1" step="0.05" data-p="bg.alpha" value="${bg.alpha??1}"></div><label class="row" style="gap:6px"><input type="checkbox" data-p="bg.front"${bg.front?' checked':''}> ブロックより手前に描く（霧・草など）</label><div class="row"><button data-act="bgFit">部屋に合わせる</button><button class="bad" data-act="bgDel">外す</button></div><div class="hint">「背景移動」ツールでドラッグでも動かせます。</div>`:''}</div>`}}
+  else if(UI.selRooms.length>1){h+=`<div class="sec"><h3>${UI.selRooms.length}部屋を選択</h3><div class="row"><label>エリア</label><select id="multiArea">${areaOpts('')}<option value="" selected>変更しない</option></select></div><button class="pri" data-act="mergeSel">この部屋たちを合成</button><button class="bad" data-act="delRoom">選択した部屋を削除</button></div>`}
+  else h+=`<div class="sec"><h3>選択なし</h3><div class="hint">${UI.mode==='over'?'部屋や接続をクリックすると、ここで編集できます。':'部屋を選ぶと詳細が出ます。'}</div></div>`;
+  return h}
+function checkHTML(li){return`<div class="sec"><h3>チェック (${li.filter(x=>x.lv!=='i').length})</h3><div class="hint">重複ID・壁で塞がった出入口・地形へのめり込みなどを自動で点検します。項目をクリックすると該当箇所へ移動します。</div><div class="list" style="max-height:none" id="lint">${li.length?li.map((x,i)=>`<button class="warnrow ${x.lv}" data-lint="${i}">${x.lv==='e'?'⛔':x.lv==='w'?'⚠':'ℹ'} <span>${esc(x.msg)}</span></button>`).join(''):'<div class="hint">問題は見つかりません。</div>'}</div></div>`}
+function lint(){const o=[];const ids={};
+  for(const id in P.rooms){const r=P.rooms[id];
+    for(const ob of r.objs){if(ids[ob.id])o.push({lv:'e',msg:`オブジェクトID重複: ${ob.id}（${ids[ob.id]} と ${r.name}）`,room:id,obj:ob.id});ids[ob.id]=r.name;
+      if(ob.x<0||ob.y<0||ob.x*TPU>rTW(r)||ob.y*TPU>rTH(r))o.push({lv:'e',msg:`${r.name}: ${ob.id} が部屋の外`,room:id,obj:ob.id});
+      if(['save','warp','entrance','respawn','enemy'].includes(ob.type)&&tileAt(r,Math.floor(ob.x*TPU),Math.floor(ob.y*TPU-.01))!=='.'&&(q=>q&&bty(q)==='solid')(BC[tileAt(r,Math.floor(ob.x*TPU),Math.floor(ob.y*TPU-.01))]))o.push({lv:'w',msg:`${r.name}: ${ob.id} が地形の中にめり込んでいます`,room:id,obj:ob.id})}
+    const items=r.objs.filter(q=>q.type==='item'&&!P.items[q.item]?.cat?.includes('消費'));if(items.length>1)o.push({lv:'w',msg:`${r.name}: 強化/装備アイテムが${items.length}個（1セル1個の方針）`,room:id});
+    if(r.objs.some(q=>q.type==='save')&&r.objs.filter(q=>q.type==='save').length>1)o.push({lv:'w',msg:`${r.name}: セーブが複数`,room:id});
+    for(const q of roomEnds(r)){const n=edgeBlocked(r,q.e);if(n)o.push({lv:'w',msg:`${r.name}: 「${room(q.other)?.name||q.other}」への出入口に壁タイルが${n}枚`,room:id,link:q.l.id});
+      const lim='LR'.includes(q.e.side)?rTH(r):rTW(r);if(q.e.from<0||q.e.to>lim||q.e.to<=q.e.from)o.push({lv:'e',msg:`${r.name}: 出入口の範囲が不正 (${q.e.from}-${q.e.to})`,room:id,link:q.l.id})}
+    if(!linksOf(id).length)o.push({lv:'i',msg:`${r.name}: どことも接続されていません`,room:id});
+    for(let j=0;j<r.rows.length;j++)for(let i=0;i<r.rows[j].length;i++){const c=r.rows[j][i];if(c!=='.'&&!BC[c]){o.push({lv:'e',msg:`${r.name}: 未定義のブロック文字 '${c}' (${i},${j})`,room:id});j=1e9;break}}}
+  for(const l of P.links){const a=room(l.a),b=room(l.b);if(!a||!b){o.push({lv:'e',msg:`接続 ${l.id}: 部屋が存在しません`,link:l.id});continue}
+    const p=adjPair(a,b);if(p){const sa=p.dx===1?'R':p.dx===-1?'L':p.dy===1?'B':'T';if(l.ea.side!==sa||l.eb.side!==OPP[sa])o.push({lv:'w',msg:`接続 ${a.name}⇄${b.name}: 隣り合っているのに出入口の辺が合っていません`,link:l.id})}
+    else o.push({lv:'i',msg:`接続 ${a.name}⇄${b.name}: 隣接していない(線で表示)`,link:l.id});
+    if(p&&l.kind!=='drop'&&'LR'.includes(l.ea.side)&&'LR'.includes(l.eb.side)&&(l.ea.from!==l.eb.from||l.ea.to!==l.eb.to))o.push({lv:'i',msg:`接続 ${a.name}⇄${b.name}: 両側の出入口の高さが違います`,link:l.id})}
+  const used={};for(const b of P.blocks){(used[b.ch]=used[b.ch]||[]).push(b.id)}for(const c in used)if(used[c].length>1)o.push({lv:'e',msg:`ブロック文字 '${c}' が重複: ${used[c].join(', ')}`});
+  return o}
+
+/* ===== パネル操作・モード ===== */
+UI.openL=true;UI.openR=true;UI.rtab='detail';
+function saveTabs(){try{localStorage.setItem('atb-tabs',JSON.stringify({l:UI.openL,r:UI.openR,t:UI.rtab}))}catch(e){}}
+function tabsUI(){const bd=$('#body');bd.style.setProperty('--dl',UI.openL?'270px':'0px');bd.style.setProperty('--dr',UI.openR?'300px':'0px');
+  $('#drL').classList.toggle('open',UI.openL);$('#drR').classList.toggle('open',UI.openR);
+  $$('[data-tab]').forEach(b=>{const t=b.dataset.tab;b.classList.toggle('on',t==='tools'?UI.openL:UI.openR&&UI.rtab===t)});
+  const n=(window.__lint||[]).filter(x=>x.lv!=='i').length;$('#chkN').textContent=n||'';
+  const has=!!(UI.selLink||UI.selRooms.length||UI.selObj||(UI.mode==='room'&&UI.room));$('#detDot').hidden=!(has&&!(UI.openR&&UI.rtab==='detail'))}
+$('#body').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(!b)return;const t=b.dataset.tab,narrow=innerWidth<=980;
+  if(t==='tools'){UI.openL=!UI.openL;if(UI.openL&&narrow)UI.openR=false}
+  else{if(UI.openR&&UI.rtab===t)UI.openR=false;else{UI.openR=true;UI.rtab=t;if(narrow)UI.openL=false}}
+  saveTabs();refreshPanels()});
+function refreshPanels(){window.__lint=lint();L_.innerHTML=leftHTML();R_.innerHTML=UI.rtab==='check'?checkHTML(window.__lint):detailHTML();paintSw();tabsUI();redraw();hud()}
+function hud(){const m=UI.mode;$$('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  const rn=curRoom();const L=$('#hudL');
+  L.innerHTML=m==='over'?`<span class="pill">概要マップ ・ ${Object.keys(P.rooms).length}部屋 ・ ${P.links.length}接続</span>${UI.merge?`<span class="pill" style="border-color:var(--warn)">合成モード: ${UI.mergeSel.length}部屋 <button data-mg="ok">決定</button> <button data-mg="no">中止</button></span>`:''}`:m==='world'?`<span class="pill">全体マップ（閲覧）</span>`:`<span class="pill">${rn?esc(rn.name)+' ・ '+rTW(rn)+'×'+rTH(rn)+' tile':'部屋未選択'}</span>`;
+  $('#hudR').innerHTML=`<span class="pill mono" id="coord" style="min-width:0"></span>${m==='room'?`<button id="zp" class="${UI.preview?'on':''}">プレビュー</button>`:''}${m==='room'?`<button id="zn">周囲</button>`:''}<button id="zo">－</button><button id="zi">＋</button><button id="zf">全体</button>`}
+function refreshAll(){$('#projName').value=P.name;refreshPanels();updUndo();chip(dirty?undefined:undefined)}
+function setMode(m){if(m==='room'&&!UI.room){UI.room=UI.selRooms[0]||Object.keys(P.rooms)[0]||null}UI.mode=m;hideHover();SEL=null;rdrag=null;drag=null;refreshAll();if(m==='room')fitRoom();else if(m==='world'&&!V.world.fit){V.world.fit=1;fitView('world')}redraw()}
+function fitRoom(){const r=curRoom();if(!r||!CWpx)return;const z=Math.min((CWpx-90)/(rTW(r)*TS),(CHpx-90)/(rTH(r)*TS));V.room.z=Math.max(.3,z);V.room.x=(CWpx-rTW(r)*TS*V.room.z)/2;V.room.y=(CHpx-rTH(r)*TS*V.room.z)/2+4;redraw()}
+function openRoom(id){UI.room=id;UI.selRooms=[id];UI.selLink=null;UI.selObj=null;setMode('room')}
+function zoomBy(k){const v=V[UI.mode];const x=CWpx/2,y=CHpx/2;const[wx,wy]=scrToWorld(v,x,y);v.z=clamp(v.z*k,.08,14);v.x=x-wx*v.z;v.y=y-wy*v.z;redraw()}
+function freeCell(){for(let d=0;d<30;d++)for(let y=-d;y<=d;y++)for(let x=-d;x<=d;x++)if(Math.max(Math.abs(x),Math.abs(y))===d&&!roomAtCell(x,y))return[x,y];return[0,0]}
+function delRooms(ids){for(const id of ids){delete P.rooms[id];delete thumbC[id]}P.links=P.links.filter(l=>P.rooms[l.a]&&P.rooms[l.b]);UI.selRooms=[];UI.selLink=null;UI.selObj=null;if(!P.rooms[UI.room])UI.room=null}
+function target(sc){const mr=UI.mode==='room'?curRoom():(UI.selRooms.length===1?room(UI.selRooms[0]):null);
+  if(sc==='room')return mr;if(sc==='flag'){if(mr&&!mr.flags)mr.flags={};return mr&&mr.flags}if(sc==='bg')return mr&&mr.bg;
+  const l=P.links.find(l=>l.id===UI.selLink);if(sc==='link')return l;if(sc==='ea')return l&&l.ea;if(sc==='eb')return l&&l.eb;
+  if(sc==='obj'){const r=curRoom();return r&&r.objs.find(o=>o.id===UI.selObj)}return null}
+function onField(e,final){const el=e.target.closest('[data-p]');if(!el)return;const[sc,key]=el.dataset.p.split('.');const t=target(sc);if(!t)return;
+  let v=el.type==='checkbox'?el.checked:el.type==='number'||el.type==='range'?parseFloat(el.value):el.value;if(typeof v==='number'&&isNaN(v))return;
+  if(sc==='room'&&['id','w','h','gx','gy'].includes(key)){if(!final)return;
+    if(key==='id'){v=String(v).trim().replace(/\s+/g,'_');if(!v||v===t.id)return refreshPanels();if(P.rooms[v]){toast('そのIDは使用中です');return refreshPanels()}
+      const old=t.id;delete P.rooms[old];t.id=v;P.rooms[v]=t;for(const l of P.links){if(l.a===old)l.a=v;if(l.b===old)l.b=v}UI.selRooms=UI.selRooms.map(i=>i===old?v:i);if(UI.room===old)UI.room=v;delete thumbC[old]}
+    else if(key==='w'||key==='h'){v=clamp(Math.round(v),1,6);const nw=key==='w'?v:t.w,nh=key==='h'?v:t.h;const sv=[t.w,t.h];t.w=nw;t.h=nh;let ok=true;for(const[x,y]of cellsOf(t)){const o=roomAtCell(x,y,t.id);if(o)ok=false}t.w=sv[0];t.h=sv[1];if(!ok){toast('他の部屋と重なります');return refreshPanels()}resizeRoom(t,nw,nh)}
+    else{const og=[t.gx,t.gy];t[key]=Math.round(v);let ok=true;for(const[x,y]of cellsOf(t)){if(roomAtCell(x,y,t.id))ok=false}if(!ok){t.gx=og[0];t.gy=og[1];toast('他の部屋と重なります');return refreshPanels()}}
+    commit();return refreshAll()}
+  if(sc==='obj'&&key==='id'){if(!final)return;v=String(v).trim();const dup=Object.values(P.rooms).some(r=>r.objs.some(o=>o!==t&&o.id===v));if(!v||dup){toast('IDが空か重複しています');return refreshPanels()}t.id=v;UI.selObj=v}
+  else if(key==='from'||key==='to'){t[key]=Math.round(v)}else t[key]=v;
+  if(sc==='obj'&&key==='type'&&final){if(t.type==='item'&&!t.item){t.item='hp_up';t.mode='contact'}if(t.type==='enemy'&&!t.kind)t.kind='bm_scout'}
+  redraw();if(final){commit();if(sc==='obj'||sc==='room'||sc==='link'||sc==='ea'||sc==='eb')refreshAll();else refreshPanels()}}
+R_.addEventListener('input',e=>{if(e.target.type==='checkbox'||e.target.tagName==='SELECT')return;onField(e,false)});
+R_.addEventListener('change',e=>{if(e.target.id==='multiArea'){if(e.target.value){for(const id of UI.selRooms)room(id).area=e.target.value;commit();refreshAll()}return}onField(e,true)});
+R_.addEventListener('click',e=>{const lk=e.target.closest('[data-lk]');if(lk){UI.selLink=lk.dataset.lk;UI.selRooms=[];UI.selObj=null;refreshPanels();return}
+  const li=e.target.closest('[data-lint]');if(li){const x=window.__lint[+li.dataset.lint];if(x.link&&UI.mode==='over'){UI.selLink=x.link;UI.selRooms=[];refreshPanels()}else if(x.room){if(x.obj){UI.selObj=x.obj;openRoom(x.room);UI.selObj=x.obj;refreshPanels()}else if(UI.mode==='over'){UI.selRooms=[x.room];refreshPanels()}else openRoom(x.room)}return}
+  const a=e.target.closest('[data-act]');if(a)act(a.dataset.act,a)});
+L_.addEventListener('click',e=>{const t=e.target.closest('button,input');if(!t)return;
+  if(t.dataset.tool){UI.tool=t.dataset.tool;refreshPanels();return}
+  if(t.dataset.room){UI.selRooms=[t.dataset.room];UI.selLink=null;if(UI.mode==='over'){const r=room(t.dataset.room),rc=rectOf(r);const v=V.over;v.x=CWpx/2-(rc.x+rc.w/2)*v.z;v.y=CHpx/2-(rc.y+rc.h/2)*v.z}refreshPanels();return}
+  if(t.dataset.rt){UI.rtool=t.dataset.rt;if(t.dataset.rt!=='sel'&&SEL){stampSel();SEL=null}refreshPanels();return}
+  if(t.dataset.ot){UI.otype=t.dataset.ot;UI.rtool='obj';refreshPanels();return}
+  if(t.closest('[data-blk]')){const b=t.closest('[data-blk]');UI.blk=b.dataset.blk;if(!['pen','line','rect','fill'].includes(UI.rtool))UI.rtool='pen';refreshPanels();return}
+  if(t.dataset.act)act(t.dataset.act,t)});
+L_.addEventListener('dblclick',e=>{const b=e.target.closest('[data-blk]');if(b){UI.blk=b.dataset.blk;blockModal()}const r=e.target.closest('[data-room]');if(r)openRoom(r.dataset.room)});
+L_.addEventListener('change',e=>{const t=e.target;
+  if(t.dataset.ck){UI[t.dataset.ck]=t.checked;redraw();return}
+  if(t.dataset.ac){P.areas[t.dataset.ac].col=t.value;commit();refreshAll();return}
+  if(t.dataset.an){P.areas[t.dataset.an].name=t.value;commit();refreshAll();return}
+  if(t.dataset.mb){P.mapBg[t.dataset.mb]=parseFloat(t.value)||0;commit();redraw();return}
+  if(t.id==='roomSel'){UI.room=t.value;UI.selRooms=[t.value];SEL=null;refreshAll();fitRoom();return}});
+L_.addEventListener('input',e=>{const t=e.target;
+  if(t.id==='rsearch'){const q=t.value.toLowerCase();$$('#rlist button').forEach(b=>b.hidden=!b.textContent.toLowerCase().includes(q)&&!b.dataset.room.toLowerCase().includes(q))}
+  if(t.dataset.mb&&t.type==='range'){P.mapBg[t.dataset.mb]=parseFloat(t.value);redraw()}});
+$('#stage').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.mg==='ok'){doMerge();return}if(b.dataset.mg==='no'){toggleMerge(false);return}if(b.id==='zi')zoomBy(1.25);if(b.id==='zo')zoomBy(.8);if(b.id==='zn'){fitNeighbors();return}if(b.id==='zp'){UI.preview=!UI.preview;refreshPanels();return}if(b.id==='zf'){UI.mode==='room'?fitRoom():fitView(UI.mode)}});
+function fileIn(id,cb){const i=document.getElementById(id);if(i){i.onchange=()=>{if(i.files[0])cb(i.files[0])};i.click()}}
+function act(a,el){const r=curRoom();if(UI.arm&&!/^(delBlock|delArea)$/.test(a))UI.arm=null;
+  switch(a){
+    case'fitNb':fitNeighbors();break;
+    case'mergeMode':toggleMerge();break;
+    case'mergeSel':UI.mergeSel=UI.selRooms.slice();doMerge();break;
+    case'typesModal':typesModal();break;
+    case'delLinkId':P.links=P.links.filter(l=>l.id!==el.dataset.id);if(UI.selLink===el.dataset.id)UI.selLink=null;commit();refreshAll();break;
+    case'carve':{const l=P.links.find(l=>l.id===UI.selLink);if(!l)break;const sc=el.dataset.w,rm=room(sc==='ea'?l.a:l.b),n=carveEnd(rm,l[sc]);commit();refreshAll();toast(n?n+'タイルの壁を開けました':'開ける壁はありません');break}
+    case'carveAll':{if(!r)break;let n=0;for(const q of roomEnds(r))n+=carveEnd(r,q.e);commit();refreshAll();toast(n?n+'タイルの壁を開けました':'開ける壁はありません');break}
+    case'delArea':{const k=el.dataset.k,ks=Object.keys(P.areas);if(ks.length<2){toast('最後のエリアは削除できません');break}
+      const n=Object.values(P.rooms).filter(q=>q.area===k).length;
+      if(UI.arm!=='area:'+k){arm('area:'+k);toast(n?n+'部屋が別のエリアに移ります。もう一度押すと削除':'もう一度押すと削除');break}
+      const to=ks.find(x=>x!==k);for(const q of Object.values(P.rooms))if(q.area===k)q.area=to;delete P.areas[k];UI.arm=null;commit();refreshAll();break}
+    case'delBlock':{const b=BI[UI.blk];if(!b)break;if(P.blocks.length<2){toast('最後のブロックは削除できません');break}
+      let n=0;for(const id in P.rooms)for(const row of P.rooms[id].rows)for(const c of row)if(c===b.ch)n++;
+      if(UI.arm!=='blk:'+b.id){arm('blk:'+b.id);toast(`「${b.id}」を削除します（配置済み${n}タイルは空になります）。もう一度押すと確定`);break}
+      for(const id in P.rooms){const q=P.rooms[id];q.rows=q.rows.map(s=>s.split(b.ch).join('.'))}
+      P.blocks=P.blocks.filter(q=>q!==b);reidx();UI.blk=P.blocks[0].id;UI.arm=null;commit();refreshAll();break}
+    case'fit':UI.mode==='room'?fitRoom():fitView(UI.mode);break;
+    case'fit1':if(UI.selRooms[0]){const x=room(UI.selRooms[0]),v=V.world;v.z=Math.min(CWpx/(rTW(x)*1.4),CHpx/(rTH(x)*1.4));v.x=CWpx/2-(x.gx*CW+rTW(x)/2)*v.z;v.y=CHpx/2-(x.gy*CH+rTH(x)/2)*v.z;redraw()}break;
+    case'addArea':{let n=1,k;do{k='area_'+n++}while(P.areas[k]);P.areas[k]={name:'新しいエリア',col:'#'+Math.floor(Math.random()*0x888888+0x555555).toString(16)};commit();refreshAll();break}
+    case'mapBg':fileIn('mapBgFile',f=>importImage(f,1600,id=>{P.mapBg={img:id,x:0,y:0,scale:1,alpha:.5};commit();refreshAll();toast('下絵を読み込みました')}));break;
+    case'mapBgDel':P.mapBg=null;commit();refreshAll();break;
+    case'prevRoom':case'nextRoom':{const ids=Object.keys(P.rooms),i=ids.indexOf(UI.room),n=ids[(i+(a==='nextRoom'?1:-1)+ids.length)%ids.length];UI.room=n;UI.selRooms=[n];SEL=null;refreshAll();fitRoom();break}
+    case'newBlock':{const used=new Set(P.blocks.map(b=>b.ch));const ch=[...CHARS].find(c=>!used.has(c));if(!ch){toast('文字が足りません');break}let n=1,id;do{id='block_'+n++}while(BI[id]);
+      const src=BI[UI.blk]||P.blocks[0];const b={id,ch,type:src.type,tex:'tex_'+id,name:'新しいブロック',col:src.col,img:null,p:clone(src.p||{})};P.blocks.push(b);reidx();UI.blk=id;commit();refreshAll();blockModal();break}
+    case'editBlock':blockModal();break;
+    case'swapLink':{const l=P.links.find(l=>l.id===UI.selLink);if(l){[l.a,l.b]=[l.b,l.a];[l.ea,l.eb]=[l.eb,l.ea];[l.req,l.rreq]=[l.rreq,l.req];commit();refreshAll()}break}
+    case'autoLink':{const l=P.links.find(l=>l.id===UI.selLink);if(l){toast(setSides(l)?'辺を位置に合わせました':'変更なし（隣接していないか既に一致）');commit();refreshAll()}break}
+    case'delLink':P.links=P.links.filter(l=>l.id!==UI.selLink);UI.selLink=null;commit();refreshAll();break;
+    case'dupObj':{const o=r&&r.objs.find(o=>o.id===UI.selObj);if(o){const c=clone(o);c.id=uniqObjId(o.type);c.x+=1/TPU;r.objs.push(c);UI.selObj=c.id;commit();refreshAll()}break}
+    case'delObj':if(r){r.objs=r.objs.filter(o=>o.id!==UI.selObj);UI.selObj=null;commit();refreshAll()}break;
+    case'openSel':if(UI.selRooms[0])openRoom(UI.selRooms[0]);break;
+    case'dupRoom':{const s=UI.mode==='room'?r:room(UI.selRooms[0]);if(!s)break;const c=clone(s);let n=1,id;do{id=s.id+'_copy'+(n>1?n:'');n++}while(P.rooms[id]);c.id=id;c.name=s.name+'(複製)';const[fx,fy]=freeCell();c.gx=fx;c.gy=fy;
+      const all=new Set();for(const q in P.rooms)for(const o of P.rooms[q].objs)all.add(o.id);for(const o of c.objs){let k=1,nid;do{nid=o.id+'_c'+k++}while(all.has(nid));o.id=nid;all.add(nid)}
+      P.rooms[id]=c;commit();if(UI.mode==='over'){UI.selRooms=[id]}refreshAll();toast('複製しました（空いている場所に配置）');break}
+    case'delRoom':{const ids=UI.mode==='room'?[UI.room]:UI.selRooms.slice();if(!ids.length)break;delRooms(ids);commit();if(UI.mode==='room')setMode('over');else refreshAll();toast(ids.length+'部屋を削除しました（Ctrl+Zで戻せます）');break}
+    case'roomBg':fileIn('bgFile',f=>importImage(f,1600,id=>{const r=curRoom();r.bg={img:id,x:0,y:0,w:CW*r.w,alpha:.8};commit();refreshAll();toast('背景を読み込みました')}));break;
+    case'bgFit':if(r&&r.bg){r.bg.x=0;r.bg.y=0;r.bg.w=CW*r.w;commit();refreshAll()}break;
+    case'bgDel':if(r){r.bg=null;commit();refreshAll()}break}}
+
+/* ===== 追加機能: 合成 / 直線接続 / 種類管理 / 出入口 / 保存 ===== */
+UI.merge=false;UI.mergeSel=[];UI.arm=null;
+function arm(k){UI.arm=k;refreshPanels();clearTimeout(arm.t);arm.t=setTimeout(()=>{if(UI.arm===k){UI.arm=null;refreshPanels()}},4000)}
+/* --- 出入口の壁を開ける --- */
+function carveEnd(r,e){const tw=rTW(r),th=rTH(r),depth=e.side==='B'?2:1;let n=0;
+  for(let i=Math.floor(e.from);i<Math.ceil(e.to);i++)for(let d=0;d<depth;d++){
+    const x=e.side==='L'?d:e.side==='R'?tw-1-d:i,y=e.side==='T'?d:e.side==='B'?th-1-d:i;
+    const b=BC[tileAt(r,x,y)];if(b&&['solid','crumble'].includes(bty(b))){setTile(r,x,y,'.');n++}}return n}
+/* --- 部屋の合成 --- */
+function toggleMerge(on){UI.merge=on===undefined?!UI.merge:on;UI.mergeSel=[];if(UI.merge){UI.tool='sel';UI.selRooms=[];UI.selLink=null;drag=null;toast('合成モード：つなげたい隣どうしの部屋を順にクリック → Enterで決定 / Escで中止')}refreshPanels()}
+function mergePick(id){const i=UI.mergeSel.indexOf(id);if(i>=0)UI.mergeSel.splice(i,1);else UI.mergeSel.push(id);hud();redraw()}
+function mergeRooms(ids){
+  const rs=ids.map(room).filter(Boolean);if(rs.length<2)return{err:'2部屋以上を選んでください'};
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;const set=new Set();
+  for(const r of rs)for(const[x,y]of cellsOf(r)){set.add(x+','+y);x0=Math.min(x0,x);y0=Math.min(y0,y);x1=Math.max(x1,x);y1=Math.max(y1,y)}
+  const W=x1-x0+1,H=y1-y0+1;if(set.size!==W*H)return{err:'合成後が長方形になりません（隙間や飛び出しがあります）'};
+  const sorted=rs.slice().sort((a,b)=>a.gy-b.gy||a.gx-b.gx),base=sorted[0],idset=new Set(ids);
+  // 内部の接続: 出入口の壁を開けてから結合
+  for(const l of P.links)if(idset.has(l.a)&&idset.has(l.b)){carveEnd(room(l.a),l.ea);carveEnd(room(l.b),l.eb)}
+  const tw=CW*W,th=CH*H,grid=Array.from({length:th},()=>Array(tw).fill('.')),objs=[];let bg=null;const fl={goal:false,pit:'',bgm:''},notes=[];
+  for(const r of sorted){const ox=(r.gx-x0)*CW,oy=(r.gy-y0)*CH;
+    r.rows.forEach((row,j)=>{for(let i=0;i<row.length;i++)if(row[i]!=='.'||!grid[oy+j][ox+i])grid[oy+j][ox+i]=row[i]});
+    for(const o of r.objs){const c=clone(o);c.x=+(c.x+ox/TPU).toFixed(2);c.y=+(c.y+oy/TPU).toFixed(2);objs.push(c)}
+    if(!bg&&r.bg&&r.bg.img){bg=clone(r.bg);bg.x=(bg.x||0)+ox;bg.y=(bg.y||0)+oy}
+    const f=r.flags||{};fl.goal=fl.goal||!!f.goal;fl.pit=fl.pit||f.pit||'';fl.bgm=fl.bgm||f.bgm||'';if(r.note)notes.push(r.note)}
+  // 外部の接続: 出入口位置をずらす
+  const off=r=>[(r.gx-x0)*CW,(r.gy-y0)*CH];
+  P.links=P.links.filter(l=>!(idset.has(l.a)&&idset.has(l.b)));
+  for(const l of P.links){for(const w of['a','b']){if(!idset.has(l[w]))continue;const r=room(l[w]),e=w==='a'?l.ea:l.eb,[dx,dy]=off(r),d='LR'.includes(e.side)?dy:dx;e.from+=d;e.to+=d;l[w]=base.id}}
+  for(const r of sorted)if(r!==base){delete P.rooms[r.id];delete thumbC[r.id]}
+  base.w=W;base.h=H;base.gx=x0;base.gy=y0;base.rows=grid.map(a=>a.join(''));base.objs=objs;base.bg=bg;base.flags=fl;base.note=notes.join('\n');delete thumbC[base.id];
+  return{id:base.id,n:rs.length}}
+function doMerge(){const r=mergeRooms(UI.mergeSel);if(r.err){toast(r.err);return}UI.merge=false;UI.mergeSel=[];UI.selRooms=[r.id];UI.selLink=null;commit();refreshAll();toast(r.n+'部屋を合成しました（内部の出入口は壁を開けています。Ctrl+Zで戻せます）')}
+/* --- 直線上の部屋をまとめて接続 / 切断 --- */
+const hasLink=(a,b)=>P.links.some(l=>(l.a===a&&l.b===b)||(l.a===b&&l.b===a));
+function lineCells(c0,wx,wy){const gx=Math.floor(wx/OV.W),gy=Math.floor(wy/OV.H),dx=gx-c0[0],dy=gy-c0[1],cells=[];
+  if(Math.abs(dx)>=Math.abs(dy)){const s=dx<0?-1:1;for(let x=c0[0];x!==gx+s;x+=s)cells.push([x,c0[1]])}else{const s=dy<0?-1:1;for(let y=c0[1];y!==gy+s;y+=s)cells.push([c0[0],y])}return cells}
+function planLink(d,wx,wy){const gx=Math.floor(wx/OV.W),gy=Math.floor(wy/OV.H),tgt=hitRoomW(wx,wy);
+  if(tgt&&tgt!==d.from&&gx!==d.c0[0]&&gy!==d.c0[1])return{rooms:[d.from,tgt],pairs:[[d.from,tgt]]};
+  const seq=[];let gap=false;
+  for(const[x,y]of lineCells(d.c0,wx,wy)){const r=roomAtCell(x,y);if(!r){gap=true;continue}const last=seq[seq.length-1];if(last&&last.id===r.id)continue;seq.push({id:r.id,gap:last?gap:false});gap=false}
+  const pairs=[];for(let i=1;i<seq.length;i++)if(!seq[i].gap)pairs.push([seq[i-1].id,seq[i].id]);
+  if(seq.length===2&&!pairs.length)pairs.push([seq[0].id,seq[1].id]);
+  return{rooms:seq.map(s=>s.id),pairs}}
+function execLink(p,del){let n=0,last=null;
+  if(del){const b=P.links.length;P.links=P.links.filter(l=>!p.pairs.some(([a,c])=>(l.a===a&&l.b===c)||(l.a===c&&l.b===a)));n=b-P.links.length;UI.selLink=null}
+  else for(const[a,b]of p.pairs)if(!hasLink(a,b)){last=mkLink(a,b);n++}
+  if(n){if(!del&&n===1)UI.selLink=last.id;UI.selRooms=[];commit();refreshAll();toast(del?n+'件の接続を切断しました':n+'件の接続を作りました')}
+  else toast(del?'切断する接続がありません':'新しくつなぐ部屋がありません（既に接続済み、または間に空きがあります）')}
+function drawLinkPreview(){const d=drag,p=planLink(d,d.wx,d.wy),col=d.del?TH.bad:TH.acc;
+  cx.lineWidth=3;cx.strokeStyle=col;cx.setLineDash([6,4]);cx.beginPath();
+  for(const[a,b]of p.pairs){const ra=rectOf(room(a)),rb=rectOf(room(b));cx.moveTo(ra.x+ra.w/2,ra.y+ra.h/2);cx.lineTo(rb.x+rb.w/2,rb.y+rb.h/2)}
+  if(!p.pairs.length){const rc=rectOf(room(d.from));cx.moveTo(rc.x+rc.w/2,rc.y+rc.h/2);cx.lineTo(d.wx,d.wy)}
+  cx.stroke();cx.setLineDash([]);
+  for(const id of p.rooms){const rc=rectOf(room(id));rrect(cx,rc.x-2,rc.y-2,rc.w+4,rc.h+4,11);cx.lineWidth=2.5;cx.strokeStyle=col;cx.stroke()}}
+/* --- 接続リスト --- */
+function connList(r){const ls=linksOf(r.id);
+  return`<div class="sec"><h3>接続 (${ls.length})</h3>${ls.length?ls.map(l=>{const o=room(l.a===r.id?l.b:l.a);return`<div class="row" style="flex-wrap:nowrap"><button data-lk="${esc(l.id)}" style="flex:1;text-align:left;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.a===r.id?'→':'←'} ${esc(o?o.name:'?')} <span class="hint">${esc((KINDS[l.kind]||'').split('(')[0])}</span></button><button class="bad" data-act="delLinkId" data-id="${esc(l.id)}" title="この接続を削除">✕</button></div>`}).join(''):'<div class="hint">接続なし</div>'}
+  ${UI.mode==='over'?'<div class="hint">部屋を長押し→直線上へドラッグ→離すと、間の部屋を順につなぎます。離すときShiftを押していると切断します。</div>':''}</div>`}
+/* --- ブロック種類の管理 --- */
+function typesModal(){
+  const rows=Object.keys(TYPES).map(k=>{const t=TYPES[k],c=!BUILTIN_T.has(k),n=P.blocks.filter(b=>b.type===k).length;
+    return`<div class="row" style="padding:3px 0;border-bottom:1px solid var(--line)"><span class="dot" style="background:${t.col}"></span><b style="flex:1;min-width:120px">${esc(t.jp)}</b><span class="hint mono">${esc(k)}${c?' → '+esc(t.base):''} ・ ${n}ブロック</span>${c?`<button class="bad" data-tdel="${esc(k)}">${UI.arm==='type:'+k?'本当に削除？':'削除'}</button>`:'<span class="hint">標準</span>'}</div>`}).join('');
+  openModal('ブロック種類の管理',`<div class="hint">ブロックの「種類」は当たり判定・挙動の分類です。独自の種類を追加でき、基本の挙動（どの標準種類と同じ判定か）を選びます。削除した種類を使っていたブロックは、基本の挙動の種類に切り替わります。</div>${rows}
+    <div class="sec" style="border-top:1px solid var(--line);padding-top:10px"><h3>種類を追加</h3>
+    <div class="row"><label>ID</label><input type="text" id="t_id" class="mono" placeholder="例: moss_ledge"></div><div class="row"><label>名前</label><input type="text" id="t_jp" placeholder="例: 苔の足場"></div>
+    <div class="row"><label>基本の挙動</label><select id="t_base">${[...BUILTIN_T].map(k=>`<option value="${k}">${TYPES[k].jp}</option>`).join('')}</select></div>
+    <div class="row"><label>色</label><input type="color" id="t_col" value="#4f9aa5" style="width:44px;padding:0;height:28px"><button class="pri" id="t_add">追加</button></div></div>`,bd=>{
+    $('#t_add').onclick=()=>{const id=$('#t_id').value.trim().replace(/\s+/g,'_'),jp=$('#t_jp').value.trim()||id;if(!id||TYPES[id]){toast('IDが空か重複しています');return}
+      P.customTypes[id]={jp,col:$('#t_col').value,base:$('#t_base').value};syncTypes();commit();refreshAll();typesModal()};
+    bd.onclick=e=>{const b=e.target.closest('[data-tdel]');if(!b)return;const k=b.dataset.tdel;
+      if(UI.arm!=='type:'+k){UI.arm='type:'+k;typesModal();setTimeout(()=>{if(UI.arm==='type:'+k){UI.arm=null}},4000);return}
+      const base=TYPES[k].base||'solid';for(const q of P.blocks)if(q.type===k)q.type=base;delete P.customTypes[k];UI.arm=null;syncTypes();commit();refreshAll();typesModal()}})}
+/* --- ファイル保存 --- */
+async function saveFile(filename,text){
+  filename=String(filename).replace(/[\\/:*?"<>|]/g,'_');let dl=null;
+  try{dl=window.claude&&await window.claude.use('downloads')}catch(e){}
+  if(dl){try{await dl.save({filename,data:text});toast('保存しました: '+filename)}catch(e){toast(e&&e.code==='declined'?'保存を取りやめました':'保存できませんでした（'+((e&&e.code)||'error')+'）。「コピー」を使ってください')}return}
+  try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));a.download=filename;document.body.appendChild(a);a.click();a.remove();toast('ダウンロードしました: '+filename)}catch(e){toast('この環境では保存できません。「コピー」を使ってください')}}
+
+/* ===== AI用Markdownの読み込み ===== */
+const mdCells=l=>l.trim().replace(/^\|/,'').replace(/\|$/,'').split('|').map(s=>s.trim());
+function mdTable(lines,need){for(let i=0;i<lines.length-1;i++){if(!/^\s*\|/.test(lines[i]))continue;if(!/^\s*\|[\s:|-]+\|?\s*$/.test(lines[i+1]))continue;
+    const h=mdCells(lines[i]);if(need&&!need.every(n=>h.includes(n)))continue;const rows=[];let j=i+2;
+    while(j<lines.length&&/^\s*\|/.test(lines[j])){const c=mdCells(lines[j]);const o={};h.forEach((k,x)=>o[k]=c[x]??'');rows.push(o);j++}return rows}return null}
+const parseExit=s=>{const m=String(s||'').match(/^([LRTB])\s+(-?\d+)\.\.(-?\d+)$/);return m?{side:m[1],from:+m[2],to:+m[3]}:null};
+function parseRoomSec(sec,warn){
+  const lines=sec.replace(/\r/g,'').split('\n'),head=lines[0].trim(),hm=head.match(/^(.+?) — (.*)$/),id=(hm?hm[1]:head).trim(),name=hm?hm[2].trim():id;
+  const r={id,name,area:'',gx:0,gy:0,w:1,h:1,rows:null,objs:[],bg:null,flags:{goal:false,pit:'',bgm:''},note:'',_bg:null};let mm;
+  for(const ln of lines){
+    if(mm=ln.match(/^- area: (\S+)/))r.area=mm[1];
+    else if(mm=ln.match(/^- overview cell: \((-?\d+),\s*(-?\d+)\), size (\d+)x(\d+)/)){r.gx=+mm[1];r.gy=+mm[2];r.w=+mm[3];r.h=+mm[4]}
+    else if(mm=ln.match(/^- flags: (.*)$/)){for(const f of mm[1].split(',').map(s=>s.trim())){if(f==='goal')r.flags.goal=true;else if(f.startsWith('pit='))r.flags.pit=f.slice(4);else if(f.startsWith('bgm='))r.flags.bgm=f.slice(4)}}
+    else if(mm=ln.match(/^- note: (.*)$/))r.note=mm[1].replace(/\\n/g,'\n');
+    else if(mm=ln.match(/^- background image: yes \(x=(-?[\d.]+), y=(-?[\d.]+), w=([\d.]+|fit)[^,]*, alpha=([\d.]+)/))r._bg={x:+mm[1],y:+mm[2],w:mm[3]==='fit'?null:+mm[3],alpha:+mm[4]}}
+  // ASCII
+  const f0=lines.findIndex(l=>l.startsWith('```'));
+  if(f0>=0){let f1=lines.findIndex((l,i)=>i>f0&&l.startsWith('```'));if(f1<0)f1=lines.length;const body=lines.slice(f0+1,f1);const rows=[];
+    let k=0;if(body.length&&body[0].startsWith('    '))k=2;
+    for(;k<body.length;k++){const m=body[k].match(/^\s*\d+ (.*)$/);if(m)rows.push(m[1].replace(/\s+$/,''))}
+    r.rows=rows}
+  const tw=CW*r.w,th=CH*r.h;
+  if(!r.rows||!r.rows.length){warn.push(`${id}: 地形(ASCII)が見つからないので空にしました`);r.rows=emptyRows(tw,th)}
+  else{if(r.rows.length!==th)warn.push(`${id}: 行数が${r.rows.length}（期待${th}）→調整しました`);
+    if(r.rows.some(s=>s.length!==tw))warn.push(`${id}: 幅が${tw}タイルでない行があります→調整しました`);
+    const n=[];for(let y=0;y<th;y++){let s=(r.rows[y]||'').slice(0,tw);n.push(s+'.'.repeat(tw-s.length))}r.rows=n}
+  // objects
+  const t=mdTable(lines,['id','type','x','y']);
+  if(t)for(const q of t){const o={id:q.id,type:q.type,x:parseFloat(q.x),y:parseFloat(q.y),label:''};if(!q.id||isNaN(o.x)||isNaN(o.y)){warn.push(`${id}: 不正なオブジェクト行 (${q.id||'?'})`);continue}
+    for(const part of String(q.detail||'').split('; ')){const e=part.indexOf('=');if(e<0)continue;const k=part.slice(0,e).trim(),v=part.slice(e+1).trim();
+      if(k==='item'){const m=v.match(/^([^()]+)(?:\((.*)\))?$/);o.item=m[1].trim();if(m[2])(r._items=r._items||{})[o.item]=m[2]}
+      else if(k==='face')o.face=parseInt(v);else if(k==='cons')o.cons=true;else if(['kind','mode','gate','cond','label'].includes(k))o[k]=v}
+    r.objs.push(o)}
+  return r}
+function parseAIMd(txt){
+  const t=txt.replace(/\r/g,''),warn=[];
+  const secs=t.split(/^## /m).slice(1),S=n=>secs.find(s=>s.startsWith(n+'.'));
+  const s1=S(1);if(!s1)throw new Error('「## 1. Block legend」が見つかりません（AI用の書き出しではありません）');
+  const nm=t.match(/^# (.+?) — map data/m);
+  const o={name:nm?nm[1]:'After the Blue',areas:{},blocks:[],rooms:{},links:[],mapBg:null,items:{},customTypes:{},images:{}};
+  // blocks
+  const l1=s1.split('\n'),bt=mdTable(l1,['char','block id','type']);if(!bt)throw new Error('ブロック凡例の表が読めません');
+  for(const q of bt){const ch=q.char.replace(/`/g,'');let p={};try{p=JSON.parse(q.params||'{}')}catch(e){}
+    if(!ch||ch.length!==1){warn.push('ブロック文字が不正: '+q.char);continue}
+    o.blocks.push({id:q['block id'],ch,type:(q.type||'solid').split(/\s+/)[0],tex:q['texture id']||'',name:q.name||q['block id'],col:q.color||null,img:null,cap:null,p})}
+  const tl=l1.find(l=>l.startsWith('Block types'));
+  if(tl)for(const it of tl.slice(tl.indexOf(':')+1).split(', ')){const m=it.trim().match(/^([^=\s]+)=(.*?)(?: \[custom, behaves as (\w+)(?:, color (#[0-9a-fA-F]{3,8}))?\])?$/);if(m&&m[3])o.customTypes[m[1]]={jp:m[2],base:m[3],col:m[4]||'#888888'}}
+  for(const b of o.blocks)if(!BUILTIN_T.has(b.type)&&!o.customTypes[b.type]){warn.push(`ブロック ${b.id}: 未定義の種類 ${b.type}→solidにしました`);b.type='solid'}
+  // areas
+  const s3=S(3);if(s3)for(const ln of s3.split('\n')){const m=ln.match(/^- ([^:]+): (.*) \((#[0-9a-fA-F]{3,8})\)\s*$/);if(m)o.areas[m[1].trim()]={name:m[2],col:m[3]}}
+  // links
+  const s6=S(6);if(s6){const lt=mdTable(s6.split('\n'),['id','from','to','kind']);
+    if(lt)for(const q of lt){const ea=parseExit(q['a exit']),eb=parseExit(q['b exit']);if(!ea||!eb){warn.push('接続 '+q.id+': 出入口が読めません');continue}
+      o.links.push({id:q.id,a:q.from,b:q.to,kind:KINDS[q.kind]?q.kind:'normal',gate:q.gate||'',req:q['req a→b']||'',rreq:q['req b→a']||'',ea,eb})}}
+  // rooms
+  const s7=S(7);if(!s7)throw new Error('「## 7. Rooms」が見つかりません');
+  for(const rs of s7.split(/^### /m).slice(1)){const r=parseRoomSec(rs,warn);if(o.rooms[r.id])warn.push('部屋IDが重複: '+r.id);o.rooms[r.id]=r}
+  if(!Object.keys(o.rooms).length)throw new Error('部屋が1つも読めませんでした');
+  for(const id in o.rooms){const r=o.rooms[id];if(!r.area)r.area=Object.keys(o.areas)[0]||'area_1';if(!o.areas[r.area]){o.areas[r.area]={name:r.area,col:'#888888'};warn.push('エリア '+r.area+' を新規作成')}
+    for(const k in (r._items||{}))o.items[k]=o.items[k]||{name:r._items[k],cat:'',icon:''}}
+  o.links=o.links.filter(l=>{const ok=o.rooms[l.a]&&o.rooms[l.b];if(!ok)warn.push('接続 '+l.id+': 存在しない部屋を参照→除外');return ok});
+  return{o,warn}}
+function mdToPacked(txt){
+  const{o,warn}=parseAIMd(txt);
+  for(const b of o.blocks){const ob=P.blocks.find(x=>x.id===b.id);if(ob){if(!b.col)b.col=ob.col;b.img=ob.img||null;b.cap=ob.cap||null}
+    if(!b.col)b.col=(o.customTypes[b.type]&&o.customTypes[b.type].col)||(TYPES[b.type]&&TYPES[b.type].col)||'#888888'}
+  for(const k in P.items)if(!o.items[k])o.items[k]=P.items[k];
+  for(const k in o.items)if(P.items[k]&&!o.items[k].cat)o.items[k]=P.items[k];
+  o.images=P.images;o.mapBg=P.mapBg;o.meta={slopes:1};
+  for(const id in o.rooms){const r=o.rooms[id];r.id=id;if(r._bg){const ob=P.rooms[id];if(ob&&ob.bg&&ob.bg.img)r.bg={img:ob.bg.img,x:r._bg.x,y:r._bg.y,w:r._bg.w||CW*r.w,alpha:r._bg.alpha}}delete r._bg;delete r._items}
+  return{json:JSON.stringify(o),warn,rooms:Object.keys(o.rooms).length,links:o.links.length,blocks:o.blocks.length}}
+/* 部屋単位の書き出し（### 見出し + block legend）を現在のプロジェクトへ追加/上書き */
+function importRoomsMd(txt,dry){
+  const t=txt.replace(/\r/g,''),warn=[],leg={};
+  for(const ln of t.split('\n')){const m=ln.match(/^(\S) = (\S+) \((\w+), tex=(.*)\)$/);if(m)leg[m[1]]={id:m[2],type:m[3],tex:m[4]}}
+  const parts=t.split(/^### /m).slice(1);if(!parts.length)throw new Error('「### 部屋ID — 名前」の見出しが見つかりません');
+  const rooms=parts.map(p=>parseRoomSec(p.split(/^--- block legend ---/m)[0],warn));
+  if(dry)return{n:rooms.length,warn,ids:rooms.map(r=>r.id)};
+  const map={};
+  for(const ch in leg){let b=P.blocks.find(x=>x.id===leg[ch].id);
+    if(!b){const used=new Set(P.blocks.map(q=>q.ch));const nc=used.has(ch)?[...CHARS].find(c=>!used.has(c)):ch;
+      b={id:leg[ch].id,ch:nc,type:TYPES[leg[ch].type]?leg[ch].type:'solid',tex:leg[ch].tex,name:leg[ch].id,col:(TYPES[leg[ch].type]||TYPES.solid).col,img:null,cap:null,p:{}};P.blocks.push(b);reidx();warn.push('ブロック '+b.id+' を新規作成')}
+    map[ch]=b.ch}
+  for(const r of rooms){r.rows=r.rows.map(s=>[...s].map(c=>c==='.'?'.':(map[c]||c)).join(''));
+    if(!P.areas[r.area]){const k=Object.keys(P.areas)[0];if(r.area)warn.push(`エリア ${r.area} が無いので ${k} にしました`);r.area=k}
+    for(const k in (r._items||{}))if(!P.items[k])P.items[k]={name:r._items[k],cat:'',icon:''};
+    const old=P.rooms[r.id];if(r._bg&&old&&old.bg&&old.bg.img)r.bg={img:old.bg.img,x:r._bg.x,y:r._bg.y,w:r._bg.w||CW*r.w,alpha:r._bg.alpha};
+    delete r._bg;delete r._items;
+    let clash=cellsOf(r).some(([x,y])=>roomAtCell(x,y,r.id));
+    if(clash){let mx=-1e9,my=1e9;for(const q of Object.values(P.rooms))if(q.id!==r.id){mx=Math.max(mx,q.gx+q.w);my=Math.min(my,q.gy)}r.gx=mx;r.gy=my;warn.push(r.id+': 位置が他の部屋と重なるので右端に置きました')}
+    delete thumbC[r.id];P.rooms[r.id]=r}
+  return{n:rooms.length,warn}}
+
+/* ===== モーダル・書き出し ===== */
+const M=$('#modal');
+function openModal(title,body,mount){M.innerHTML=`<div class="box" role="dialog" aria-label="${esc(title)}"><div class="hd"><span style="flex:1">${esc(title)}</span><button data-close>閉じる</button></div><div class="bd">${body}</div></div>`;M.hidden=false;if(mount)mount(M.querySelector('.bd'))}
+function closeModal(){M.hidden=true;M.innerHTML=''}
+M.addEventListener('click',e=>{if(e.target===M||e.target.closest('[data-close]'))closeModal()});
+async function copyText(ta,btn){ta.select();let ok=false;try{await navigator.clipboard.writeText(ta.value);ok=true}catch(e){try{ok=document.execCommand('copy')}catch(e2){}}
+  if(btn){const t=btn.textContent;btn.textContent=ok?'コピーしました':'選択しました（Ctrl+C）';setTimeout(()=>btn.textContent=t,1600)}}
+const README_EN='Coordinates: tile (x,y) origin top-left, x right, y down. 1 unit = '+TPU+' tiles. One map cell = 16x9 units = '+CW+'x'+CH+' tiles. Object x,y are in units (y = feet/bottom anchor). tile rows use block chars from "blocks"; "." is empty.';
+function exportJSON(light){const o=JSON.parse(ser());o._readme=README_EN;o.format='atb-map-v1';o.tpu=TPU;o.cell={tiles:[CW,CH],units:[16,9]};
+  if(light){o.blocks=o.blocks.map(b=>({...b,img:b.img?'(texture image omitted)':null,cap:b.cap?'(omitted)':null}));for(const id in o.rooms){const r=o.rooms[id];if(r.bg)r.bg={...r.bg,img:r.bg.img?'(omitted)':null}}if(o.mapBg)o.mapBg={...o.mapBg,img:'(omitted)'}}
+  else o.images=P.images;return JSON.stringify(o,null,light?1:0)}
+function ruler(w){let a='    ',b='    ';for(let i=0;i<w;i++){a+=i%10===0?String(Math.floor(i/10)%10):' ';b+=i%10}return a+'\n'+b}
+function roomAI(r){const a=P.areas[r.area]||{name:r.area};let s=`### ${r.id} — ${r.name}\n- area: ${r.area} (${a.name})\n- overview cell: (${r.gx}, ${r.gy}), size ${r.w}x${r.h} cells = ${rTW(r)}x${rTH(r)} tiles = ${rTW(r)/TPU}x${rTH(r)/TPU} units\n`;
+  const fl=r.flags||{};const f=[];if(fl.goal)f.push('goal');if(fl.pit)f.push('pit='+fl.pit);if(fl.bgm)f.push('bgm='+fl.bgm);if(f.length)s+=`- flags: ${f.join(', ')}\n`;if(r.note)s+=`- note: ${r.note.replace(/\n/g,'\\n')}\n`;
+  s+=`- background image: ${r.bg&&r.bg.img?'yes (x='+r.bg.x+', y='+r.bg.y+', w='+(r.bg.w||'fit')+' tiles, alpha='+r.bg.alpha+')':'none'}\n`;
+  s+='\n```\n'+ruler(rTW(r))+'\n'+r.rows.map((x,i)=>String(i).padStart(3,' ')+' '+x).join('\n')+'\n```\n';
+  const cnt={};for(const row of r.rows)for(const c of row)if(c!=='.')cnt[c]=(cnt[c]||0)+1;
+  if(Object.keys(cnt).length)s+='\nblock counts: '+Object.entries(cnt).map(([c,n])=>`${(BC[c]||{id:'?'+c}).id}=${n}`).join(', ')+'\n';
+  const ends=roomEnds(r);if(ends.length){s+='\nexits:\n';for(const q of ends){const o=room(q.other);s+=`- ${SIDES[q.e.side]}(${q.e.side}) tiles ${q.e.from}..${q.e.to} → ${q.other}${o?' ('+o.name+')':''} [${q.l.id}, ${q.l.kind}${q.l.gate?', gate='+q.l.gate:''}]\n`}}
+  if(r.objs.length){s+='\nobjects (x,y in units; tile = unit*'+TPU+'):\n| id | type | x | y | tile | detail |\n|---|---|---|---|---|---|\n';
+    for(const o of r.objs){const d=[];if(o.kind)d.push('kind='+o.kind);if(o.item)d.push('item='+o.item+(P.items[o.item]?'('+P.items[o.item].name+')':''));if(o.mode)d.push('mode='+o.mode);if(o.gate)d.push('gate='+o.gate);if(o.cond)d.push('cond='+o.cond);if(o.label)d.push('label='+o.label);if(o.face!=null)d.push('face='+o.face);if(o.cons)d.push('cons=1');
+      s+=`| ${o.id} | ${o.type} | ${o.x} | ${o.y} | (${Math.floor(o.x*TPU)},${Math.floor(o.y*TPU)}) | ${d.join('; ')} |\n`}}
+  return s+'\n'}
+function exportAI(){
+  let s=`# ${P.name} — map data\n\n${README_EN}\n\nThis document is generated by the map editor (it can be re-imported with the editor's 読み込み) and is the source of truth for level layout. "tile rows" are ASCII: each character is one tile.\n\n`;
+  s+='## 1. Block legend\n| char | block id | type | texture id | name | color | params |\n|---|---|---|---|---|---|---|\n'+P.blocks.map(b=>`| \`${b.ch}\` | ${b.id} | ${b.type} (${TYPES[b.type].jp}) | ${b.tex||''} | ${b.name} | ${b.col||''} | ${JSON.stringify(b.p||{})} |`).join('\n')+'\n';
+  s+='\nBlock types (collision behavior): '+Object.keys(TYPES).map(k=>k+'='+TYPES[k].jp+(TYPES[k].base?' [custom, behaves as '+TYPES[k].base+', color '+TYPES[k].col+']':'')).join(', ')+'\n';
+  s+='\nSlope shapes (type slope, params.shape): BR=filled triangle at bottom-right (floor rises to the right, 45deg), BL=bottom-left (rises to the left), TR/TL=ceiling slopes, R1/R2=gentle right-rising slope first(low)/second(high) tile, L1/L2=gentle left-rising slope first(high)/second(low) tile. 45deg = 0.5 unit rise per tile; gentle = 0.25 unit per tile.\n';
+  s+='\nTile "." = empty. Blocks with the same type but different texture id use different art (e.g. ground_a vs ground_b).\n\n';
+  const tx={};for(const b of P.blocks)(tx[b.tex||'(none)']=tx[b.tex||'(none)']||[]).push(b.id);
+  s+='## 2. Texture ids\n'+Object.entries(tx).map(([t,b])=>`- ${t}: ${b.join(', ')}`).join('\n')+'\n\n';
+  s+='## 3. Areas\n'+Object.entries(P.areas).map(([k,a])=>`- ${k}: ${a.name} (${a.col})`).join('\n')+'\n\n';
+  const rs=Object.values(P.rooms).sort((a,b)=>a.gy-b.gy||a.gx-b.gx);const lab={};rs.forEach((r,i)=>lab[r.id]=String(i+1).padStart(2,'0'));
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const r of rs){x0=Math.min(x0,r.gx);y0=Math.min(y0,r.gy);x1=Math.max(x1,r.gx+r.w-1);y1=Math.max(y1,r.gy+r.h-1)}
+  s+='## 4. Overview map (cell grid; each number = room index, see list)\n```\n';for(let y=y0;y<=y1;y++){let l='';for(let x=x0;x<=x1;x++){const r=roomAtCell(x,y);l+=(r?lab[r.id]:'..')+' '}s+=l.trimEnd()+'\n'}s+='```\nColumns start at x='+x0+', rows start at y='+y0+'.\n\n';
+  s+='## 5. Room list\n| # | id | name | area | cell | size | objects |\n|---|---|---|---|---|---|---|\n'+rs.map(r=>`| ${lab[r.id]} | ${r.id} | ${r.name} | ${r.area} | (${r.gx},${r.gy}) | ${r.w}x${r.h} | ${r.objs.length} |`).join('\n')+'\n\n';
+  s+='## 6. Connections\n(a→b direction matters for kind=drop/oneway. tiles = opening range along that edge.)\n| id | from | to | kind | gate | req a→b | req b→a | a exit | b exit |\n|---|---|---|---|---|---|---|---|---|\n'+P.links.map(l=>`| ${l.id} | ${l.a} | ${l.b} | ${l.kind} | ${l.gate||''} | ${l.req||''} | ${l.rreq||''} | ${l.ea.side} ${l.ea.from}..${l.ea.to} | ${l.eb.side} ${l.eb.from}..${l.eb.to} |`).join('\n')+'\n\n';
+  s+='## 7. Rooms\n\n'+rs.map(roomAI).join('');return s}
+function exportModal(){
+  const tabs=[['ai','AI用テキスト (Markdown)'],['full','JSON（完全・画像込み）'],['light','JSON（画像なし・軽量）'],['room','現在の部屋だけ']];
+  openModal('書き出し',`<div class="tabs" id="etabs" style="align-self:flex-start;flex-wrap:wrap">${tabs.map(([k,t],i)=>`<button data-e="${k}" class="${i?'':'on'}">${t}</button>`).join('')}</div><div class="hint" id="ehint"></div><textarea id="etxt" readonly spellcheck="false"></textarea><div class="row"><button class="pri" id="esave">ファイルに保存</button><button id="ecopy">コピー</button><span class="hint" id="esize"></span></div>`,bd=>{
+    let cur='ai';const fname=()=>{const n=(P.name||'map').replace(/\s+/g,'_');return cur==='ai'?n+'_map_ai.md':cur==='full'?n+'_map.json':cur==='light'?n+'_map_light.json':((curRoom()||room(UI.selRooms[0])||{id:'room'}).id)+'.md'};
+    const set=k=>{cur=k;$$('#etabs button').forEach(b=>b.classList.toggle('on',b.dataset.e===k));let t='',h='';
+      if(k==='ai'){t=exportAI();h='AIに貼り付ける用。ブロック凡例・接続・各部屋のASCII地形・オブジェクト表を含みます。'}
+      else if(k==='full'){t=exportJSON(false);h='バックアップ／別ブラウザへの移行用。「読み込み」にそのまま貼れます（背景・テクスチャ画像込み）。'}
+      else if(k==='light'){t=exportJSON(true);h='画像を除いた軽量JSON。AIやコードで扱う用。読み込みも可能（画像は空になります）。'}
+      else{const r=curRoom()||room(UI.selRooms[0]);t=r?roomAI(r)+'\n--- block legend ---\n'+P.blocks.map(b=>`${b.ch} = ${b.id} (${b.type}, tex=${b.tex})`).join('\n'):'部屋を選んでください';h='1部屋ぶんのASCII地形とオブジェクト表。AIに部屋単位で相談するとき用。'}
+      $('#etxt').value=t;$('#ehint').textContent=h;$('#esize').textContent=(t.length/1024).toFixed(1)+' KB ・ '+t.split('\n').length+' 行'};
+    $('#etabs').onclick=e=>{const b=e.target.closest('button');if(b)set(b.dataset.e)};$('#ecopy').onclick=()=>copyText($('#etxt'),$('#ecopy'));$('#esave').onclick=()=>saveFile(fname(),$('#etxt').value);set('ai')})}
+function importModal(){
+  openModal('読み込み',`<div class="hint">次のどれでも読み込めます。<br>① 書き出したJSON（完全／軽量）　② <b>AI用Markdown</b>（「AI用に書き出し」の.md。AIが直したものも可）　③ 「現在の部屋だけ」の書き出し（現在のプロジェクトに追加／同じIDは上書き）。<br>①②は現在のプロジェクトを置き換えます（直前に自動で「版」を保存）。MarkdownにはテクスチャやIDの画像が含まれないため、同じブロックID・部屋IDの画像は現在のものを引き継ぎます。</div><input type="file" id="ifile" accept=".json,.md,.txt,text/plain,application/json,text/markdown"><textarea id="itxt" placeholder="ここにJSONまたはMarkdownを貼り付け" spellcheck="false"></textarea><div class="row"><button class="pri" id="igo">読み込む</button><span class="hint" id="imsg"></span></div>`,bd=>{
+    $('#ifile').onchange=e=>{const f=e.target.files[0];if(f){const fr=new FileReader();fr.onload=()=>{$('#itxt').value=fr.result;$('#imsg').textContent=f.name+' を読み込みました。「読み込む」を押してください'};fr.readAsText(f)}};
+    let armed=false;$('#itxt').oninput=()=>{armed=false;$('#igo').textContent='読み込む'};
+    $('#igo').onclick=async()=>{const t=$('#itxt').value.trim(),msg=$('#imsg');if(!t){msg.textContent='内容が空です';return}
+      const kind=/^[\[{]/.test(t)?'json':/##\s*1\.\s*Block legend/.test(t)?'md':/^###\s/m.test(t)?'room':'?';
+      if(kind==='?'){msg.textContent='形式が判別できません（JSON / AI用Markdown / 部屋単位Markdown）';return}
+      let info='',pre=null;
+      try{if(kind==='json'){JSON.parse(t);info='JSON'}
+        else if(kind==='md'){pre=mdToPacked(t);info=`AI用Markdown: ${pre.rooms}部屋・${pre.links}接続・${pre.blocks}ブロック`}
+        else{const d=importRoomsMd(t,true);pre={warn:d.warn};info=`部屋単位: ${d.n}部屋（${d.ids.join(', ')}）を追加/上書き`}}
+      catch(e){msg.textContent='読めません: '+e.message;return}
+      const w=pre&&pre.warn&&pre.warn.length?`（注意${pre.warn.length}件: ${pre.warn.slice(0,3).join(' / ')}${pre.warn.length>3?' …':''}）`:'';
+      if(!armed){armed=true;$('#igo').textContent='この内容で読み込む（もう一度押す）';msg.textContent=info+' '+w;return}
+      await saveVersion(kind==='room'?'部屋読み込み前の自動保存':'読み込み前の自動保存');
+      try{if(kind==='room'){const r=importRoomsMd(t,false);commit();dirty=true;await saveNow();closeModal();refreshAll();toast(r.n+'部屋を反映しました'+(r.warn.length?`（注意${r.warn.length}件）`:''))}
+        else{loadPacked(kind==='md'?pre.json:t);UI.room=null;UI.selRooms=[];UI.selLink=null;UI.selObj=null;commit();dirty=true;await saveNow();closeModal();setMode('over');fitView('over');toast('読み込みました'+(pre&&pre.warn&&pre.warn.length?`（注意${pre.warn.length}件）`:''))}}
+      catch(e){msg.textContent='失敗: '+e.message}}})}
+async function versionsModal(){
+  const keys=(await kvKeys()).filter(k=>String(k).startsWith('ver:')).sort().reverse();const rows=[];
+  for(const k of keys){const raw=await kvGet(k);try{const v=JSON.parse(raw);rows.push({k,label:v.label,at:v.at,size:raw.length})}catch(e){}}
+  openModal('保存した版',`<div class="row"><input type="text" id="vlabel" placeholder="版の名前（例: 校舎エリア完成）" style="flex:1"><button class="pri" id="vsave">現在の状態を版として保存</button></div>
+    <div class="hint">版はこのブラウザに残ります。大きな変更の前に残しておくと安心です。別端末へ移すには「AI用に書き出し」→JSONを使ってください。</div>
+    <div class="list" style="max-height:none">${rows.length?rows.map(r=>`<div class="row" style="padding:3px 0;border-bottom:1px solid var(--line)"><div style="flex:1;min-width:0"><b>${esc(r.label||'(無題)')}</b><div class="hint">${new Date(r.at).toLocaleString('ja-JP')} ・ ${(r.size/1024).toFixed(0)}KB</div></div><button data-vr="${r.k}">復元</button><button class="bad" data-vd="${r.k}">削除</button></div>`).join(''):'<div class="hint">まだありません。</div>'}</div>
+    <div class="sec" style="border-top:1px solid var(--line);padding-top:10px"><h3>プロジェクトの初期化</h3><div class="row"><button data-reset="seed">試作版の${Object.keys(SEED.rooms).length}部屋でやり直す</button><button data-reset="blank">空のプロジェクトにする</button></div></div>`,bd=>{
+    $('#vsave').onclick=async()=>{await saveVersion($('#vlabel').value||'手動保存');versionsModal()};
+    bd.onclick=async e=>{const b=e.target.closest('button');if(!b)return;
+      if(b.dataset.vr){if(b.dataset.arm!=='1'){b.dataset.arm='1';b.textContent='本当に復元？';return}const v=JSON.parse(await kvGet(b.dataset.vr));await saveVersion('復元前の自動保存');loadPacked(v.data);UI.room=null;UI.selRooms=[];UI.selLink=null;commit();dirty=true;await saveNow();closeModal();setMode('over');fitView('over');toast('復元しました')}
+      else if(b.dataset.vd){await kvDel(b.dataset.vd);versionsModal()}
+      else if(b.dataset.reset){if(b.dataset.arm!=='1'){b.dataset.arm='1';b.textContent='本当に初期化？（現在は自動で版に保存）';return}await saveVersion('初期化前の自動保存');P=b.dataset.reset==='seed'?newProject(SEED):newProject(null);if(b.dataset.reset==='blank'){P.rooms={};P.links=[]}reidx();last=ser();undoS=[];redoS=[];UI.room=null;UI.selRooms=[];UI.selLink=null;dirty=true;await saveNow();closeModal();setMode('over');fitView('over')}}})}
+function helpModal(){openModal('使い方',`<div style="display:grid;gap:12px;line-height:1.6">
+  <div><b>1. 概要マップ</b>：部屋は面（セル）で並びます。ドラッグで移動すると中身はそのまま、つながり(接続)だけ追従します。「つなぐ」ツールで部屋から部屋へドラッグすると接続が作れます。マウスを乗せると中身が大きく出ます。ダブルクリックで詳細へ。</div>
+  <div><b>2. 部屋詳細</b>：1タイル=0.5unit（1セル=16×9unit=32×18タイル）。ブロックを鉛筆・直線・矩形・塗りつぶしで配置。ブロックは <code>ID</code> と <code>テクスチャID</code> を別に持ち、同じ種類でも別の見た目にできます（ダブルクリックで編集）。緑の帯が出入口で、ドラッグで位置を動かせます。</div>
+  <div><b>3. 全体マップ</b>：全部屋の実際の地形をつなげて確認します。</div>
+  <div><b>4. 保存</b>：変更は自動でこのブラウザに保存されます。「版」で名前付きの控え、「AI用に書き出し」でMarkdown/JSONを取り出せます。</div>
+  <table class="kv"><tr><td><kbd>P</kbd><kbd>E</kbd><kbd>L</kbd><kbd>R</kbd><kbd>F</kbd><kbd>I</kbd><kbd>S</kbd><kbd>O</kbd><kbd>B</kbd></td><td>鉛筆/消しゴム/直線/矩形/塗り/スポイト/範囲/物体/背景移動</td></tr>
+  <tr><td><kbd>1</kbd>–<kbd>9</kbd></td><td>ブロック選択</td></tr><tr><td><kbd>Space</kbd>+ドラッグ / 右ドラッグ</td><td>画面移動</td></tr><tr><td>ホイール</td><td>拡大縮小</td></tr>
+  <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd>/<kbd>Y</kbd></td><td>元に戻す/やり直す</td></tr><tr><td><kbd>Ctrl</kbd>+<kbd>C</kbd>/<kbd>X</kbd>/<kbd>V</kbd>, <kbd>H</kbd></td><td>範囲のコピー/切り取り/貼り付け/左右反転</td></tr>
+  <tr><td><kbd>Delete</kbd></td><td>選択した部屋・接続・オブジェクト・範囲を削除</td></tr><tr><td><kbd>Tab</kbd></td><td>概要→詳細→全体の切替</td></tr><tr><td><kbd>G</kbd></td><td>グリッド表示</td></tr></table></div>`)}
+function blockModal(){const b=BI[UI.blk];if(!b)return;
+  const prm={oneway:`<div class="row"><label>通れる向き</label><select data-bp="dir">${['R','L','U','D'].map(d=>`<option value="${d}"${b.p.dir===d?' selected':''}>${{R:'→ 右へのみ',L:'← 左へのみ',U:'↑ 上へのみ',D:'↓ 下へのみ'}[d]}</option>`).join('')}</select></div>`,
+    crumble:`<div class="row"><label>崩れるまで(tick)</label><input type="number" data-bp="delay" value="${b.p.delay??30}"></div>`,hazard:`<div class="row"><label>ダメージ</label><input type="number" data-bp="dmg" value="${b.p.dmg??200}"></div>`,
+    slope:`<div class="row"><label>形</label><select data-bp="shape">${[['BR','◢ 右上がり45°（床）'],['BL','◣ 左上がり45°（床）'],['TR','◥ 天井・右下がり'],['TL','◤ 天井・左下がり'],['R1','右上がり緩斜面 前半（低い側）'],['R2','右上がり緩斜面 後半（高い側）'],['L1','左上がり緩斜面 前半（高い側）'],['L2','左上がり緩斜面 後半（低い側）']].map(([v,t])=>`<option value="${v}"${(b.p.shape||'BR')===v?' selected':''}>${t}</option>`).join('')}</select></div><div class="hint">45°は1タイルで0.5unit、緩斜面は2タイルで0.5unit上下します。緩斜面は前半・後半を横に並べて置きます。</div>`,
+    gate:`<div class="row"><label>ゲートID</label><input type="text" data-bp="gate" value="${esc(b.p.gate||'')}"></div>`}[bty(b)]||'';
+  openModal('ブロックの編集',`<div class="row"><canvas id="bprev" width="96" height="96" style="width:96px;height:96px;border-radius:6px;background:var(--canvas)"></canvas><div style="flex:1;min-width:200px;display:grid;gap:6px">
+    <div class="row"><label>ブロックID</label><input type="text" id="b_id" value="${esc(b.id)}" class="mono"></div><div class="row"><label>テクスチャID</label><input type="text" id="b_tex" value="${esc(b.tex||'')}" class="mono"></div><div class="row"><label>名前</label><input type="text" id="b_name" value="${esc(b.name)}"></div></div></div>
+    <div class="row"><label>種類</label><select id="b_type">${Object.keys(TYPES).map(k=>`<option value="${k}"${b.type===k?' selected':''}>${TYPES[k].jp}</option>`).join('')}</select></div>
+    <div class="row"><label>タイル文字</label><input type="text" id="b_ch" value="${esc(b.ch)}" maxlength="1" class="mono" style="max-width:60px"><span class="hint">ASCII出力で使う1文字</span></div>
+    <div class="row"><label>色</label><input type="color" id="b_col" value="${b.col||'#888888'}" style="width:44px;padding:0;height:28px"></div>${prm}
+    <div class="row"><label>上面キャップ</label><input type="file" id="b_cap" accept="image/*" hidden><button id="b_capb">画像を読み込む</button>${b.cap?'<button class="bad" id="b_capx">外す</button>':''}<span class="hint">上が空いたタイルの上面に重ねる（草・苔など）</span></div>
+    <div class="row"><label>テクスチャ画像</label><input type="file" id="b_img" accept="image/*" hidden><button id="b_imgb">画像を読み込む</button>${b.img?'<button class="bad" id="b_imgx">外す</button>':''}<span class="hint">見た目に使います（256px以内に縮小・透過PNG可）。足場は横幅に合わせ、縦は画像の比率で下へはみ出して描画され、乗れる面は上端です</span></div>
+    <div class="row" style="border-top:1px solid var(--line);padding-top:10px"><button id="b_dup">複製</button><button class="bad" id="b_del">このブロックを削除</button><span class="hint">削除すると配置済みの同ブロックは空になります</span></div>`,bd=>{
+    const pv=()=>{const c=$('#bprev').getContext('2d');c.clearRect(0,0,96,96);for(let i=0;i<3;i++)for(let j=0;j<3;j++)drawBlock(c,b,i*32,j*32,32)};pv();
+    const done=()=>{commit();reidx();thumbC.__x=0;refreshAll();pv()};
+    $('#b_id').onchange=e=>{const v=e.target.value.trim();if(!v||(BI[v]&&BI[v]!==b)){toast('IDが空か重複');e.target.value=b.id;return}b.id=v;UI.blk=v;done()};
+    $('#b_tex').onchange=e=>{b.tex=e.target.value.trim();done()};$('#b_name').onchange=e=>{b.name=e.target.value;done()};
+    $('#b_col').oninput=e=>{b.col=e.target.value;pv();redraw()};$('#b_col').onchange=done;
+    $('#b_type').onchange=e=>{b.type=e.target.value;b.p={};if(bty(b)==='oneway')b.p.dir='R';if(bty(b)==='slope')b.p.shape='BR';if(bty(b)==='crumble')b.p.delay=30;blockModal();commit();refreshAll()};
+    $('#b_ch').onchange=e=>{const v=e.target.value;if(!v||v==='.'||(BC[v]&&BC[v]!==b)){toast('文字が空・「.」・重複は使えません');e.target.value=b.ch;return}const old=b.ch;for(const id in P.rooms){const r=P.rooms[id];r.rows=r.rows.map(s=>s.split(old).join(v))}b.ch=v;done()};
+    bd.querySelectorAll('[data-bp]').forEach(i=>i.onchange=()=>{b.p[i.dataset.bp]=i.type==='number'?parseFloat(i.value):i.value;done()});
+    $('#b_imgb').onclick=()=>$('#b_img').click();$('#b_img').onchange=e=>{if(e.target.files[0])importImage(e.target.files[0],256,id=>{b.img=id;done();blockModal()})};
+    $('#b_capb').onclick=()=>$('#b_cap').click();$('#b_cap').onchange=e=>{if(e.target.files[0])importImage(e.target.files[0],256,id=>{b.cap=id;done();blockModal()})};const cx_=$('#b_capx');if(cx_)cx_.onclick=()=>{b.cap=null;done();blockModal()};
+    const x=$('#b_imgx');if(x)x.onclick=()=>{b.img=null;done();blockModal()};
+    $('#b_dup').onclick=()=>{const used=new Set(P.blocks.map(q=>q.ch));const ch=[...CHARS].find(c=>!used.has(c));if(!ch)return toast('文字が足りません');let n=2,id;do{id=b.id+'_'+n++}while(BI[id]);P.blocks.push({...clone(b),id,ch,tex:b.tex+'_2'});reidx();UI.blk=id;commit();refreshAll();blockModal()};
+    let arm=false;$('#b_del').onclick=()=>{if(P.blocks.length<2)return toast('最後のブロックは削除できません');if(!arm){arm=true;$('#b_del').textContent='本当に削除';return}
+      for(const id in P.rooms){const r=P.rooms[id];r.rows=r.rows.map(s=>s.split(b.ch).join('.'))}P.blocks=P.blocks.filter(q=>q!==b);reidx();UI.blk=P.blocks[0].id;commit();closeModal();refreshAll()}})}
+$('#bExp').onclick=exportModal;$('#bImp').onclick=importModal;$('#bVer').onclick=versionsModal;$('#bHelp').onclick=helpModal;$('#bSave').onclick=()=>saveNow(false);
+$('#bUndo').onclick=undo;$('#bRedo').onclick=redo;
+$('#tabs').onclick=e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.m)};
+$('#projName').onchange=e=>{P.name=e.target.value||'After the Blue';commit()};
+$('#bTheme').onclick=()=>{const d=document.documentElement,c=d.dataset.theme;const n=c==='dark'?'light':c==='light'?'':'dark';if(n)d.dataset.theme=n;else delete d.dataset.theme;try{localStorage.setItem('atb-theme',n)}catch(e){}readTheme();redraw();toast('テーマ: '+(n||'システム設定'))};
+/* ===== キー ===== */
+const inField=e=>/INPUT|TEXTAREA|SELECT/.test(e.target.tagName);
+addEventListener('keyup',e=>{if(e.code==='Space')spaceDown=false});
+addEventListener('keydown',e=>{
+  if(!M.hidden){if(e.key==='Escape')closeModal();return}
+  if(inField(e))return;const k=e.key.toLowerCase(),mod=e.ctrlKey||e.metaKey;
+  if(e.code==='Space'){spaceDown=true;e.preventDefault();return}
+  if(mod&&k==='z'){e.preventDefault();e.shiftKey?redo():undo();return}if(mod&&k==='y'){e.preventDefault();redo();return}if(mod&&k==='s'){e.preventDefault();saveNow(false);return}
+  if(k==='tab'){e.preventDefault();setMode({over:'room',room:'world',world:'over'}[UI.mode]);return}
+  if(UI.mode==='over'){
+    if(k==='m'&&!mod){if(!e.repeat)toggleMerge();return}
+    if(UI.merge){if(k==='enter')doMerge();else if(k==='escape')toggleMerge(false);return}
+    if(k==='delete'||k==='backspace'){if(UI.selLink){act('delLink')}else if(UI.selRooms.length){act('delRoom')}}
+    else if(k==='enter'&&UI.selRooms[0])openRoom(UI.selRooms[0]);else if(k==='v'){UI.tool='sel';refreshPanels()}else if(k==='a'){UI.tool='add';refreshPanels()}else if(k==='c'&&!mod){UI.tool='link';refreshPanels()}else if(k==='escape'){drag=null;UI.selRooms=[];UI.selLink=null;refreshPanels()}
+    return}
+  if(UI.mode==='room'){const r=curRoom();if(!r)return;
+    const tool={p:'pen',e:'erase',l:'line',r:'rect',f:'fill',i:'pick',s:'sel',o:'obj',b:'bg'}[k];
+    if(tool&&!mod){if(UI.rtool==='sel'&&tool!=='sel'&&SEL){stampSel();SEL=null}UI.rtool=tool;refreshPanels();return}
+    if(/^[1-9]$/.test(k)&&P.blocks[+k-1]){UI.blk=P.blocks[+k-1].id;if(!['pen','line','rect','fill'].includes(UI.rtool))UI.rtool='pen';refreshPanels();return}
+    if(k==='v'){UI.preview=!UI.preview;refreshPanels();return}
+    if(k==='g'){UI.showGrid=!UI.showGrid;refreshPanels();return}
+    if(mod&&k==='c'&&SEL){clip=SEL.buf||selRows();toast('コピー');return}
+    if(mod&&k==='x'&&SEL){clip=SEL.buf||selRows();if(!SEL.buf){clearSel();commit()}else SEL.buf=null;redraw();return}
+    if(mod&&k==='v'&&clip){if(SEL&&SEL.buf)stampSel();const t=hoverT||[0,0];SEL={x:t[0],y:t[1],w:clip[0].length,h:clip.length,buf:clip.slice()};UI.rtool='sel';refreshPanels();e.preventDefault();return}
+    if(k==='h'&&SEL){const rev=a=>a.map(s=>[...s].reverse().join(''));if(SEL.buf)SEL.buf=rev(SEL.buf);else{const rows=rev(selRows());rows.forEach((s,j)=>{for(let i=0;i<s.length;i++)setTile(r,SEL.x+i,SEL.y+j,s[i])});commit()}redraw();return}
+    if(k==='enter'&&SEL&&SEL.buf){stampSel();redraw();return}
+    if(k==='escape'){if(SEL&&SEL.buf){SEL.buf=null}SEL=null;UI.selObj=null;UI.selLink=null;refreshPanels();return}
+    if(k==='delete'||k==='backspace'){if(SEL){if(SEL.buf)SEL.buf=null;else{clearSel();commit()}redraw()}else if(UI.selObj){act('delObj')}else if(UI.selLink){act('delLink')}return}
+    const arrows={arrowleft:[-1,0],arrowright:[1,0],arrowup:[0,-1],arrowdown:[0,1]}[k];if(arrows&&UI.selObj){const o=r.objs.find(q=>q.id===UI.selObj);if(o){o.x+=arrows[0]/TPU;o.y+=arrows[1]/TPU;commit();refreshAll();e.preventDefault()}}}
+  });
+/* ===== 画像のドロップ/貼り付け ===== */
+function dropImage(f){if(!f||!/^image\//.test(f.type))return false;
+  if(UI.mode==='room'&&curRoom()){importImage(f,1600,id=>{const r=curRoom();r.bg={img:id,x:0,y:0,w:CW*r.w,alpha:1};commit();refreshAll();toast('背景に入れました')});return true}
+  if(UI.mode==='over'){importImage(f,1600,id=>{P.mapBg={img:id,x:0,y:0,scale:1,alpha:.5};commit();refreshAll();toast('下絵に入れました')});return true}return false}
+const stg=$('#stage');stg.addEventListener('dragover',e=>e.preventDefault());stg.addEventListener('drop',e=>{e.preventDefault();dropImage(e.dataTransfer.files[0])});
+addEventListener('paste',e=>{if(inField(e)||!M.hidden)return;const it=[...(e.clipboardData?.items||[])].find(i=>i.type.startsWith('image/'));if(it){e.preventDefault();dropImage(it.getAsFile())}});
+/* ===== 起動 ===== */
+addEventListener('resize',()=>{sizeCanvas();if(UI.mode==='room'&&0)fitRoom()});
+new ResizeObserver(sizeCanvas).observe($('#stage'));
+matchMedia('(prefers-color-scheme:dark)').addEventListener?.('change',()=>{readTheme();redraw()});
+window.__atb={ser:()=>ser()};
+(async function main(){
+  try{const t=localStorage.getItem('atb-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}
+  try{const t=JSON.parse(localStorage.getItem('atb-tabs')||'null');if(t){UI.openL=!!t.l;UI.openR=!!t.r;UI.rtab=t.t==='check'?'check':'detail'}}catch(e){}
+  if(innerWidth<=980){UI.openL=false;UI.openR=false}
+  readTheme();let loaded=false;
+  try{const raw=await kvGet('project');if(raw){loadPacked(raw);loaded=true}}catch(e){console.warn(e)}
+  if(!loaded){P=newProject(SEED);reidx();last=ser()}
+  sizeCanvas();$('#projName').value=P.name;setMode('over');fitView('over');updUndo();
+  chip(loaded?'保存済み（前回の続き）':'試作版の部屋を読み込み済み');dirty=false;
+  if(!loaded){dirty=true;chip('未保存の変更あり');saveNow(true)}
+})();
+
+
+})();
+</script>
+
+</body></html>
